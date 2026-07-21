@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AoV Poster Changer</title>
+<style>
+/* ── Themes ───────────────────────────────────────────────────────────── */
+:root {
+  --bg:#070b14;--bg2:#0d1220;--bg3:#111827;--panel:#131b2e;
+  --border:#1e2d47;--border2:#243550;
+  --accent:#38bdf8;--accent2:#0ea5e9;
+  --gold:#f5c518;--gold2:#d4a017;
+  --green:#22c55e;--red:#ef4444;--yellow:#f59e0b;
+  --text:#cbd5e1;--text2:#94a3b8;--text3:#64748b;
+  --glow:rgba(56,189,248,.18);
+}
+[data-theme="purple"]{--accent:#a855f7;--accent2:#9333ea;--gold:#f472b6;--glow:rgba(168,85,247,.18)}
+[data-theme="green"] {--accent:#22c55e;--accent2:#16a34a;--gold:#86efac;--glow:rgba(34,197,94,.18)}
+[data-theme="orange"]{--accent:#f97316;--accent2:#ea580c;--gold:#fbbf24;--glow:rgba(249,115,22,.18)}
+[data-theme="rose"]  {--accent:#f43f5e;--accent2:#e11d48;--gold:#fb7185;--glow:rgba(244,63,94,.18)}
+[data-theme="teal"]  {--accent:#2dd4bf;--accent2:#0d9488;--gold:#a78bfa;--glow:rgba(45,212,191,.18)}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 40% at 20% 80%,rgba(14,165,233,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 30% at 80% 10%,rgba(245,197,24,.04) 0%,transparent 50%);
+  transition:background .5s;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+header{
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 18px;
+  background:rgba(7,11,20,.92);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(14px);
+  gap:10px;flex-wrap:wrap;
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),var(--gold));
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 0 12px var(--glow);transition:background .4s;
+}
+.logo-title{
+  font-size:15px;font-weight:700;letter-spacing:.5px;
+  background:linear-gradient(90deg,var(--accent),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  transition:all .4s;
+}
+.logo-sub{font-size:10px;color:var(--text3)}
+.header-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* Theme dots */
+.theme-row{display:flex;align-items:center;gap:5px}
+.theme-dot{
+  width:18px;height:18px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:transform .15s,border-color .15s;
+  flex-shrink:0;
+}
+.theme-dot:hover{transform:scale(1.25)}
+.theme-dot.active{border-color:#fff}
+.theme-dot.t-blue  {background:linear-gradient(135deg,#38bdf8,#f5c518)}
+.theme-dot.t-purple{background:linear-gradient(135deg,#a855f7,#f472b6)}
+.theme-dot.t-green {background:linear-gradient(135deg,#22c55e,#86efac)}
+.theme-dot.t-orange{background:linear-gradient(135deg,#f97316,#fbbf24)}
+.theme-dot.t-rose  {background:linear-gradient(135deg,#f43f5e,#fb7185)}
+.theme-dot.t-teal  {background:linear-gradient(135deg,#2dd4bf,#a78bfa)}
+
+.fps-box{
+  font-size:11px;font-family:monospace;
+  background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);
+  border-radius:6px;padding:3px 9px;min-width:66px;text-align:center;
+  color:var(--green);
+}
+.fps-box span{font-size:14px;font-weight:700}
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+.wrapper{
+  position:relative;z-index:1;
+  max-width:1320px;margin:0 auto;padding:18px 14px 40px;
+  display:grid;grid-template-columns:1fr 420px;gap:18px;
+}
+@media(max-width:900px){.wrapper{grid-template-columns:1fr}}
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+.card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  animation:fadeUp .35s ease both;
+}
+.card-head{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 15px;border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.02);
+}
+.step-badge{
+  width:21px;height:21px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),#6366f1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#fff;
+  transition:background .4s;
+}
+.card-title{font-size:13px;font-weight:600;color:var(--text)}
+.card-collapse-btn{
+  margin-left:auto;background:none;border:none;cursor:pointer;
+  color:var(--text3);font-size:16px;transition:transform .2s,color .2s;padding:0 2px;
+}
+.card-collapse-btn:hover{color:var(--text)}
+.card-body{padding:13px 15px}
+.card-body.collapsed{display:none}
+
+/* ── Segments ────────────────────────────────────────────────────────────── */
+.seg-group{display:flex;gap:6px;flex-wrap:wrap}
+.seg-btn{
+  flex:1;min-width:90px;padding:8px 10px;
+  border:1px solid var(--border2);border-radius:8px;
+  background:transparent;color:var(--text2);cursor:pointer;
+  font-size:12px;font-weight:500;transition:all .2s;text-align:center;
+}
+.seg-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--glow)}
+.seg-btn.active{
+  border-color:var(--accent);background:rgba(var(--accent-rgb,56,189,248),.12);
+  color:var(--accent);box-shadow:0 0 8px var(--glow);
+}
+.seg-btn .seg-icon{font-size:16px;display:block;margin-bottom:2px}
+.seg-btn .seg-label{display:block;font-weight:600}
+.seg-btn .seg-desc{font-size:10px;color:var(--text3);margin-top:1px}
+.seg-btn.active .seg-desc{color:rgba(56,189,248,.7)}
+
+.sub-group{
+  margin-top:10px;padding:10px 12px;
+  background:rgba(255,255,255,.02);border:1px solid var(--border);
+  border-radius:8px;display:none;
+}
+.sub-group.visible{display:block}
+.sub-label{font-size:11px;color:var(--text3);margin-bottom:7px}
+
+/* ── Upload zone ─────────────────────────────────────────────────────────── */
+.upload-zone{
+  border:1.5px dashed var(--border2);border-radius:10px;
+  padding:14px;text-align:center;cursor:pointer;
+  transition:all .2s;position:relative;
+}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:var(--glow)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:22px;margin-bottom:5px}
+.upload-text{font-size:12px;color:var(--text2)}
+.upload-hint{font-size:10px;color:var(--text3);margin-top:2px}
+.file-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);
+  border-radius:6px;padding:3px 9px;font-size:12px;color:var(--accent);
+  margin-top:7px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.file-chip .rm{cursor:pointer;color:var(--red);margin-left:3px;font-size:14px}
+
+/* ── Inputs ──────────────────────────────────────────────────────────────── */
+.inp{
+  width:100%;padding:8px 11px;background:var(--bg2);
+  border:1px solid var(--border2);border-radius:8px;
+  color:var(--text);font-size:13px;outline:none;transition:border-color .2s;
+}
+.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+.inp::placeholder{color:var(--text3)}
+.inp-row{display:flex;gap:7px;align-items:center}
+.inp-btn{
+  padding:8px 13px;border:1px solid var(--border2);border-radius:8px;
+  background:transparent;color:var(--text2);cursor:pointer;
+  font-size:12px;white-space:nowrap;transition:all .2s;flex-shrink:0;
+}
+.inp-btn:hover{border-color:var(--accent);color:var(--accent)}
+.inp-btn.primary{
+  border-color:var(--accent);background:var(--glow);color:var(--accent);font-weight:600;
+}
+.inp-btn.primary:hover{background:rgba(56,189,248,.25)}
+
+.or-div{display:flex;align-items:center;gap:8px;margin:9px 0;color:var(--text3);font-size:11px}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── Image preview ───────────────────────────────────────────────────────── */
+.img-preview-wrap{margin-top:9px;display:none}
+.img-preview-wrap.visible{display:block}
+.img-preview-label{font-size:11px;color:var(--text3);margin-bottom:5px}
+.img-preview-box{
+  width:100%;max-height:160px;border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;display:flex;align-items:center;
+  justify-content:center;background:var(--bg2);
+}
+.img-preview-box img{max-width:100%;max-height:160px;object-fit:contain;display:block}
+
+/* ── Pinterest ───────────────────────────────────────────────────────────── */
+.pin-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
+  gap:6px;margin-top:10px;max-height:340px;overflow-y:auto;
+}
+.pin-grid::-webkit-scrollbar{width:4px}
+.pin-grid::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.pin-thumb{
+  aspect-ratio:1;border-radius:7px;overflow:hidden;cursor:pointer;
+  border:2px solid transparent;transition:all .2s;
+  position:relative;background:var(--bg3);
+}
+.pin-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
+.pin-thumb:hover{border-color:var(--accent);transform:scale(1.03)}
+.pin-thumb:hover img{transform:scale(1.08)}
+.pin-thumb .pin-type-badge{
+  position:absolute;top:3px;right:3px;
+  background:rgba(0,0,0,.6);border-radius:4px;
+  padding:1px 4px;font-size:9px;color:#fff;
+}
+.pin-loading{text-align:center;padding:20px;color:var(--text3);font-size:12px}
+.pin-none{text-align:center;padding:16px;color:var(--text3);font-size:12px}
+.url-loading{font-size:11px;color:var(--text3);margin-top:5px;display:none}
+.url-loading.visible{display:block;animation:pulse 1.2s infinite}
+
+/* ── Pinterest modal overlay ────────────────────────────────────────────── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex}
+.modal-box{
+  background:var(--panel);border:1px solid var(--border2);border-radius:16px;
+  padding:20px;max-width:380px;width:90%;animation:fadeUp .25s ease;
+}
+.modal-img-preview{
+  width:100%;max-height:220px;border-radius:10px;overflow:hidden;
+  border:1px solid var(--border);background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+}
+.modal-img-preview img{max-width:100%;max-height:220px;object-fit:contain;display:block}
+.modal-title{font-size:14px;font-weight:600;margin-bottom:4px;color:var(--text)}
+.modal-desc{font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.4;max-height:36px;overflow:hidden}
+.modal-toggle-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;padding:8px 10px;background:var(--bg2);border-radius:8px}
+.toggle-switch{position:relative;width:36px;height:20px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{
+  position:absolute;cursor:pointer;inset:0;
+  background:var(--border2);border-radius:20px;transition:.3s;
+}
+.toggle-slider::before{
+  content:'';position:absolute;height:14px;width:14px;
+  left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;
+}
+.toggle-switch input:checked+.toggle-slider{background:var(--accent)}
+.toggle-switch input:checked+.toggle-slider::before{transform:translateX(16px)}
+.toggle-label{font-size:12px;color:var(--text2)}
+.modal-btns{display:flex;gap:8px;flex-wrap:wrap}
+.modal-btn{
+  flex:1;padding:9px;border-radius:8px;font-size:12px;font-weight:600;
+  cursor:pointer;border:1px solid var(--border2);background:transparent;
+  color:var(--text2);transition:all .2s;min-width:100px;text-align:center;
+}
+.modal-btn.accent{border-color:var(--accent);color:var(--accent);background:var(--glow)}
+.modal-btn.accent:hover{background:rgba(56,189,248,.25)}
+.modal-btn.gold{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.08)}
+.modal-btn.gold:hover{background:rgba(245,197,24,.2)}
+.modal-btn.cancel{color:var(--text3)}
+.modal-btn.cancel:hover{color:var(--text);border-color:var(--border2)}
+.modal-processing{
+  text-align:center;padding:10px;font-size:12px;color:var(--accent);
+  display:none;animation:pulse 1.2s infinite;
+}
+.modal-processing.visible{display:block}
+
+/* ── Image editor ────────────────────────────────────────────────────────── */
+.editor-wrap{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}
+@media(max-width:600px){.editor-wrap{grid-template-columns:1fr}}
+
+.canvas-wrap{position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:5px}
+.poster-canvas{
+  border:1px solid var(--border2);border-radius:8px;
+  background:repeating-conic-gradient(#1a2030 0% 25%,#0d1220 0% 50%) 0 0/12px 12px;
+  display:block;cursor:crosshair;touch-action:none;
+}
+.canvas-size-label{font-size:10px;color:var(--text3)}
+
+/* controls */
+.ctrl-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+@media(max-width:500px){.ctrl-grid{grid-template-columns:1fr}}
+
+.ctrl-item{display:flex;flex-direction:column;gap:2px}
+.ctrl-label{font-size:11px;color:var(--text3);display:flex;justify-content:space-between}
+.ctrl-val{color:var(--accent);font-weight:600}
+.ctrl-slider{
+  -webkit-appearance:none;width:100%;height:4px;
+  border-radius:2px;background:var(--border2);outline:none;cursor:pointer;
+}
+.ctrl-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 6px var(--glow);cursor:pointer;
+  transition:background .3s;
+}
+.ctrl-slider::-moz-range-thumb{
+  width:13px;height:13px;border-radius:50%;
+  background:var(--accent);border:none;box-shadow:0 0 6px var(--glow);
+}
+
+/* pivot */
+.pivot-wrap{margin-top:6px}
+.pivot-label{font-size:11px;color:var(--text3);margin-bottom:5px}
+.pivot-grid{display:grid;grid-template-columns:repeat(3,26px);gap:3px}
+.pivot-cell{
+  width:26px;height:26px;border:1px solid var(--border2);border-radius:4px;
+  background:transparent;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;
+}
+.pivot-cell::after{content:'';width:4px;height:4px;border-radius:50%;background:var(--text3);transition:background .15s}
+.pivot-cell:hover{border-color:var(--accent)}
+.pivot-cell:hover::after{background:var(--accent)}
+.pivot-cell.active{border-color:var(--accent);background:rgba(56,189,248,.15)}
+.pivot-cell.active::after{background:var(--accent);box-shadow:0 0 4px var(--accent)}
+
+/* sticker list */
+.sticker-list{margin-top:10px;display:flex;flex-direction:column;gap:5px}
+.sticker-item{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:8px;padding:5px 8px;cursor:pointer;transition:all .15s;
+}
+.sticker-item:hover{border-color:var(--accent)}
+.sticker-item.active{border-color:var(--accent);background:var(--glow)}
+.sticker-thumb{width:32px;height:32px;object-fit:contain;border-radius:4px;background:var(--bg3)}
+.sticker-info{flex:1;min-width:0}
+.sticker-name{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sticker-del{
+  background:none;border:none;color:var(--text3);cursor:pointer;
+  font-size:15px;padding:2px;transition:color .15s;flex-shrink:0;
+}
+.sticker-del:hover{color:var(--red)}
+
+.selected-ctrl{
+  margin-top:8px;padding:10px;background:var(--bg2);
+  border:1px solid var(--border);border-radius:8px;display:none;
+}
+.selected-ctrl.visible{display:block}
+
+/* toggle/flip/reset row */
+.toggle-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:7px}
+.tog-btn{
+  padding:4px 11px;border:1px solid var(--border2);border-radius:6px;
+  background:transparent;color:var(--text2);cursor:pointer;font-size:11px;transition:all .15s;
+}
+.tog-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tog-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.08)}
+.reset-btn{
+  margin-left:auto;padding:4px 11px;border:1px solid var(--red);
+  border-radius:6px;background:transparent;color:var(--red);cursor:pointer;font-size:11px;transition:all .15s;
+}
+.reset-btn:hover{background:rgba(239,68,68,.1)}
+
+/* ── Run button ──────────────────────────────────────────────────────────── */
+.run-btn{
+  width:100%;padding:12px;border:none;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent2),#6366f1);
+  color:#fff;font-size:14px;font-weight:700;cursor:pointer;
+  letter-spacing:.5px;transition:all .2s;position:relative;overflow:hidden;
+}
+.run-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.run-btn:hover:not(:disabled)::before{opacity:1}
+.run-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(14,165,233,.3)}
+.run-btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+
+.progress-wrap{margin-top:9px;display:none}
+.progress-wrap.visible{display:block}
+.progress-bar-outer{height:6px;border-radius:3px;background:var(--border);overflow:hidden}
+.progress-bar-inner{
+  height:100%;width:0%;border-radius:3px;
+  background:linear-gradient(90deg,var(--accent2),var(--accent));
+  transition:width .3s ease;box-shadow:0 0 8px var(--glow);
+}
+.progress-label{font-size:11px;color:var(--text3);margin-top:4px}
+
+.stats-row{display:flex;gap:7px;margin-top:9px}
+.stat-chip{flex:1;padding:7px;border-radius:8px;text-align:center;border:1px solid}
+.stat-chip.ok{border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.06)}
+.stat-chip.fail{border-color:rgba(239,68,68,.25);background:rgba(239,68,68,.06)}
+.stat-chip .val{font-size:20px;font-weight:700;display:block}
+.stat-chip.ok .val{color:var(--green)}
+.stat-chip.fail .val{color:var(--red)}
+.stat-chip .lbl{font-size:10px;color:var(--text3)}
+
+/* ── Terminal ────────────────────────────────────────────────────────────── */
+.terminal{
+  background:#020408;border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;display:flex;flex-direction:column;min-height:460px;
+}
+.term-head{
+  display:flex;align-items:center;gap:5px;padding:7px 13px;
+  background:#0a0e17;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.term-dot{width:10px;height:10px;border-radius:50%}
+.term-dot.r{background:#ff5f57}.term-dot.y{background:#febc2e}.term-dot.g{background:#28c840}
+.term-title{font-size:11px;color:var(--text3);margin-left:4px}
+.term-clear{margin-left:auto;font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:2px 7px;border-radius:4px;transition:color .15s}
+.term-clear:hover{color:var(--text)}
+.term-body{
+  flex:1;overflow-y:auto;padding:9px 11px;
+  font-family:'Cascadia Code','Fira Code','JetBrains Mono',monospace;
+  font-size:12px;line-height:1.7;scroll-behavior:smooth;
+}
+.term-body::-webkit-scrollbar{width:4px}
+.term-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.log-line{display:flex;gap:7px;animation:logIn .15s ease both}
+.log-ts{color:#3d5269;flex-shrink:0}
+.log-icon{flex-shrink:0}
+.log-msg{color:var(--text);word-break:break-all;flex:1}
+.log-line.ok  .log-msg{color:#4ade80}
+.log-line.err .log-msg{color:#f87171}
+.log-line.info .log-msg{color:#38bdf8}
+.log-line.warn .log-msg{color:#fbbf24}
+.log-line.dim  .log-msg{color:#3d5269}
+.log-line.gold .log-msg{color:var(--gold)}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes logIn{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:translateX(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎮</div>
+    <div>
+      <div class="logo-title">AoV Poster Changer</div>
+      <div class="logo-sub">Liên Quân Mobile</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="theme-row" title="Đổi màu giao diện">
+      <div class="theme-dot t-blue   active" onclick="setTheme('',this)"   title="Xanh dương"></div>
+      <div class="theme-dot t-purple"         onclick="setTheme('purple',this)" title="Tím"></div>
+      <div class="theme-dot t-green"          onclick="setTheme('green',this)"  title="Xanh lá"></div>
+      <div class="theme-dot t-orange"         onclick="setTheme('orange',this)" title="Cam"></div>
+      <div class="theme-dot t-rose"           onclick="setTheme('rose',this)"   title="Hồng đỏ"></div>
+      <div class="theme-dot t-teal"           onclick="setTheme('teal',this)"   title="Ngọc"></div>
+    </div>
+    <div class="fps-box"><span id="fpsVal">--</span> FPS</div>
+  </div>
+</header>
+
+<div class="wrapper">
+<!-- ════ COL LEFT ════ -->
+<div style="display:flex;flex-direction:column;gap:14px">
+
+  <!-- Step 1 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="step-badge">1</div>
+      <span class="card-title">Loại poster</span>
+    </div>
+    <div class="card-body">
+      <div class="seg-group">
+        <button class="seg-btn active" data-poster="player" onclick="setPosterType('player',this)">
+          <span class="seg-icon">🖼️</span>
+          <span class="seg-label">Nền Load Trận</span>
+        </button>
+        <button class="seg-btn" data-poster="flowborn" onclick="setPosterType('flowborn',this)">
+          <span class="seg-icon">⚔️</span>
+          <span class="seg-label">Flowborn</span>
+        </button>
+      </div>
+      <div class="sub-group" id="jobGroup">
+        <div class="sub-label">Chọn hệ:</div>
+        <div class="seg-group">
+          <button class="seg-btn active" onclick="setJob([5],this)"><span class="seg-label">🏹 Xạ Thủ</span></button>
+          <button class="seg-btn"        onclick="setJob([4],this)"><span class="seg-label">🔮 Pháp Sư</span></button>
+          <button class="seg-btn"        onclick="setJob([5,4],this)"><span class="seg-label">⚡ Cả hai</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="card">
+    <div class="card-head">
+      <div class="step-badge">2</div>
+      <span class="card-title">Xác thực</span>
+    </div>
+    <div class="card-body">
+      <div class="seg-group" id="authSegs" style="margin-bottom:11px">
+        <button class="seg-btn active" onclick="setAuthMode('har',this)">
+          <span class="seg-icon">📁</span><span class="seg-label">File HAR</span>
+        </button>
+        <button class="seg-btn" onclick="setAuthMode('link',this)">
+          <span class="seg-icon">🔗</span><span class="seg-label">Link</span>
+        </button>
+      </div>
+      <div id="harPanel">
+        <div class="upload-zone" id="harZone"
+             ondragover="event.preventDefault();this.classList.add('dragover')"
+             ondragleave="this.classList.remove('dragover')"
+             ondrop="handleHarDrop(event)">
+          <input type="file" accept=".har" id="harFileInput" onchange="handleHarFile(this.files[0])">
+          <div class="upload-icon">📂</div>
+          <div class="upload-text">Kéo & thả file <b>.har</b></div>
+          <div class="upload-hint">hoặc click để chọn</div>
+        </div>
+        <div id="harChip" style="display:none" class="file-chip">
+          📄 <span id="harFileName"></span>
+          <span class="rm" onclick="clearHar()">✕</span>
+        </div>
+      </div>
+      <div id="linkPanel" style="display:none">
+        <input class="inp" id="linkInput" type="text" placeholder="https://kgvn-camp.mobagarena.com/app/player-poster?access_token=..."/>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">Android: AoV → Camp → Poster → copy URL · iOS: Charles/Stream intercept</div>
+        <div id="encPanel" style="display:none;margin-top:9px">
+          <div style="font-size:10px;color:var(--yellow);margin-bottom:4px">⚠️ Flowborn cần header <b>encodeparam</b> (lấy từ F12 → Network)</div>
+          <input class="inp" id="encInput" type="text" placeholder="encodeparam (bỏ trống nếu không có)"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Ảnh -->
+  <div class="card">
+    <div class="card-head">
+      <div class="step-badge">3</div>
+      <span class="card-title">Ảnh poster</span>
+      <button class="card-collapse-btn" onclick="toggleCard(this)">▾</button>
+    </div>
+    <div class="card-body">
+      <div class="upload-zone"
+           ondragover="event.preventDefault();this.classList.add('dragover')"
+           ondragleave="this.classList.remove('dragover')"
+           ondrop="handleImgDrop(event)">
+        <input type="file" accept="image/*" id="imgFileInput" onchange="handleImgFile(this.files[0])">
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-text">Kéo & thả ảnh hoặc click chọn</div>
+        <div class="upload-hint">PNG · JPG · WEBP</div>
+      </div>
+      <div class="or-div">hoặc link ảnh</div>
+      <div class="inp-row">
+        <input class="inp" id="imgUrlInput" type="text" placeholder="https://i.imgur.com/..."/>
+        <button class="inp-btn" onclick="loadImgFromUrl()">Tải</button>
+      </div>
+      <div class="url-loading" id="urlLoading">⏳ Đang tải...</div>
+      <div class="img-preview-wrap" id="imgPreviewWrap">
+        <div class="img-preview-label">📷 Ảnh chính</div>
+        <div class="img-preview-box"><img id="imgPreviewEl" src="" alt="preview"></div>
+        <div id="imgInfo" style="font-size:10px;color:var(--text3);margin-top:3px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Pinterest search -->
+  <div class="card">
+    <div class="card-head">
+      <div class="step-badge">🔍</div>
+      <span class="card-title">Tìm ảnh Pinterest</span>
+      <button class="card-collapse-btn" onclick="toggleCard(this)">▾</button>
+    </div>
+    <div class="card-body">
+      <div class="inp-row">
+        <input class="inp" id="pinSearchInput" type="text" placeholder="Nhập từ khoá (VD: anime poster, fantasy...)"
+               onkeydown="if(event.key==='Enter')pinSearch()"/>
+        <button class="inp-btn primary" onclick="pinSearch()">Tìm</button>
+      </div>
+      <div id="pinGrid" class="pin-grid" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <!-- Step 5: Editor -->
+  <div class="card">
+    <div class="card-head">
+      <div class="step-badge">4</div>
+      <span class="card-title">Chỉnh sửa & Trang trí</span>
+      <button class="card-collapse-btn" onclick="toggleCard(this)">▾</button>
+    </div>
+    <div class="card-body">
+      <div class="editor-wrap">
+        <!-- Canvas -->
+        <div class="canvas-wrap">
+          <canvas id="posterCanvas" class="poster-canvas" width="192" height="302"></canvas>
+          <div class="canvas-size-label" id="canvasLabel">Preview 192×302</div>
+          <button onclick="exportCanvas()" style="margin-top:3px;padding:3px 10px;font-size:10px;border:1px solid var(--border2);border-radius:5px;background:transparent;color:var(--text3);cursor:pointer">💾 Xuất PNG</button>
+        </div>
+
+        <!-- Controls -->
+        <div>
+          <!-- Layer tabs -->
+          <div style="display:flex;gap:5px;margin-bottom:8px">
+            <button class="inp-btn active" id="tabBg" onclick="selectLayer('bg')" style="flex:1;font-size:11px">🖼 Ảnh chính</button>
+            <button class="inp-btn" id="tabSticker" onclick="selectLayer('sticker')" style="flex:1;font-size:11px">🎨 Sticker</button>
+          </div>
+
+          <!-- BG controls -->
+          <div id="bgControls">
+            <div class="ctrl-grid">
+              <div class="ctrl-item">
+                <div class="ctrl-label">Vị trí X <span class="ctrl-val" id="vPosX">0px</span></div>
+                <input type="range" class="ctrl-slider" id="sPosX" min="-200" max="200" value="0" oninput="updateEditor()">
+              </div>
+              <div class="ctrl-item">
+                <div class="ctrl-label">Vị trí Y <span class="ctrl-val" id="vPosY">0px</span></div>
+                <input type="range" class="ctrl-slider" id="sPosY" min="-200" max="200" value="0" oninput="updateEditor()">
+              </div>
+              <div class="ctrl-item">
+                <div class="ctrl-label">Scale <span class="ctrl-val" id="vScale">100%</span></div>
+                <input type="range" class="ctrl-slider" id="sScale" min="5" max="500" value="100" oninput="updateEditor()">
+              </div>
+              <div class="ctrl-item">
+                <div class="ctrl-label">Xoay <span class="ctrl-val" id="vRotate">0°</span></div>
+                <input type="range" class="ctrl-slider" id="sRotate" min="-180" max="180" value="0" oninput="updateEditor()">
+              </div>
+              <div class="ctrl-item">
+                <div class="ctrl-label">Scale X <span class="ctrl-val" id="vScaleX">100%</span></div>
+                <input type="range" class="ctrl-slider" id="sScaleX" min="1" max="300" value="100" oninput="updateEditor()">
+              </div>
+              <div class="ctrl-item">
+                <div class="ctrl-label">Scale Y <span class="ctrl-val" id="vScaleY">100%</span></div>
+                <input type="range" class="ctrl-slider" id="sScaleY" min="1" max="300" value="100" oninput="updateEditor()">
+              </div>
+              <div class="ctrl-item" style="grid-column:1/-1">
+                <div class="ctrl-label">Opacity <span class="ctrl-val" id="vOpacity">100%</span></div>
+                <input type="range" class="ctrl-slider" id="sOpacity" min="0" max="100" value="100" oninput="updateEditor()">
+              </div>
+            </div>
+            <div class="pivot-wrap">
+              <div class="pivot-label">Trục xoay (Pivot)</div>
+              <div class="pivot-grid" id="pivotGrid"></div>
+            </div>
+            <div class="toggle-row">
+              <button class="tog-btn" id="btnFlipH" onclick="toggleFlip('H')">↔ Ngang</button>
+              <button class="tog-btn" id="btnFlipV" onclick="toggleFlip('V')">↕ Dọc</button>
+              <button class="reset-btn" onclick="resetEditor()">↺ Reset</button>
+            </div>
+          </div>
+
+          <!-- Sticker controls -->
+          <div id="stickerControls" style="display:none">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:6px">
+              Kéo sticker trực tiếp trên canvas · Pinch để zoom (mobile)
+            </div>
+            <div class="sticker-list" id="stickerList">
+              <div style="font-size:11px;color:var(--text3);padding:8px 0">
+                Chưa có sticker — tìm ảnh Pinterest hoặc upload để thêm
+              </div>
+            </div>
+            <!-- Selected sticker controls -->
+            <div class="selected-ctrl" id="selectedCtrl">
+              <div style="font-size:11px;color:var(--accent);font-weight:600;margin-bottom:7px">⚙ Chỉnh sticker đang chọn</div>
+              <div class="ctrl-grid">
+                <div class="ctrl-item">
+                  <div class="ctrl-label">Scale <span class="ctrl-val" id="svScale">100%</span></div>
+                  <input type="range" class="ctrl-slider" id="ssScale" min="5" max="500" value="100" oninput="updateSelectedSticker()">
+                </div>
+                <div class="ctrl-item">
+                  <div class="ctrl-label">Xoay <span class="ctrl-val" id="svRotate">0°</span></div>
+                  <input type="range" class="ctrl-slider" id="ssRotate" min="-180" max="180" value="0" oninput="updateSelectedSticker()">
+                </div>
+                <div class="ctrl-item" style="grid-column:1/-1">
+                  <div class="ctrl-label">Opacity <span class="ctrl-val" id="svOpacity">100%</span></div>
+                  <input type="range" class="ctrl-slider" id="ssOpacity" min="0" max="100" value="100" oninput="updateSelectedSticker()">
+                </div>
+              </div>
+              <div class="toggle-row" style="margin-top:6px">
+                <button class="tog-btn" id="sbtnFlipH" onclick="toggleStickerFlip('H')">↔ Ngang</button>
+                <button class="tog-btn" id="sbtnFlipV" onclick="toggleStickerFlip('V')">↕ Dọc</button>
+                <button class="reset-btn" onclick="deleteSelectedSticker()" style="border-color:var(--red);color:var(--red)">🗑 Xoá</button>
+              </div>
+            </div>
+            <!-- Add sticker from local file -->
+            <div style="margin-top:8px">
+              <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:5px">Thêm ảnh sticker từ file:</label>
+              <div class="upload-zone" style="padding:10px">
+                <input type="file" accept="image/*" onchange="addStickerFromFile(this.files[0])">
+                <div style="font-size:12px;color:var(--text3)">📎 Click hoặc kéo thả ảnh</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Run -->
+  <div class="card">
+    <div class="card-body">
+      <button class="run-btn" id="runBtn" onclick="runTool()">🚀 Bắt đầu đổi poster</button>
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-bar-outer"><div class="progress-bar-inner" id="progressBar"></div></div>
+        <div class="progress-label" id="progressLabel">Đang xử lý...</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-chip ok"><span class="val" id="statOk">0</span><span class="lbl">Thành công</span></div>
+        <div class="stat-chip fail"><span class="val" id="statFail">0</span><span class="lbl">Thất bại</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end col left -->
+
+<!-- ════ COL RIGHT: Terminal ════ -->
+<div>
+  <div class="terminal">
+    <div class="term-head">
+      <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+      <span class="term-title">Terminal</span>
+      <button class="term-clear" onclick="clearTerminal()">Xoá</button>
+    </div>
+    <div class="term-body" id="terminal"></div>
+  </div>
+</div>
+
+</div><!-- end wrapper -->
+
+<!-- ── Pinterest action modal ── -->
+<div class="modal-overlay" id="pinModal" onclick="if(event.target===this)closePinModal()">
+  <div class="modal-box">
+    <div class="modal-img-preview"><img id="modalImg" src="" alt="preview"></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-desc" id="modalDesc"></div>
+    <div class="modal-toggle-row">
+      <label class="toggle-switch">
+        <input type="checkbox" id="removeBgToggle">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label">✨ Xoá nền trắng/đơn sắc</span>
+    </div>
+    <div class="modal-processing" id="modalProcessing">⏳ Đang xử lý xoá nền...</div>
+    <div class="modal-btns">
+      <button class="modal-btn accent" onclick="addPinAsMain()">🖼 Làm ảnh chính</button>
+      <button class="modal-btn gold"   onclick="addPinAsSticker()">🎨 Thêm sticker</button>
+      <button class="modal-btn cancel" onclick="closePinModal()">Hủy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════
+   FPS
+════════════════════════════════════════════════ */
+let fps=0,fpsFrames=0,fpsLast=performance.now();
+(function tick(now){
+  fpsFrames++;
+  if(now-fpsLast>=1000){
+    fps=fpsFrames;fpsFrames=0;fpsLast=now;
+    const el=document.getElementById('fpsVal');
+    if(el){el.textContent=fps;el.style.color=fps>=55?'#4ade80':fps>=30?'#fbbf24':'#f87171'}
+  }
+  requestAnimationFrame(tick);
+})(performance.now());
+
+/* ════════════════════════════════════════════════
+   THEME
+════════════════════════════════════════════════ */
+function setTheme(name,dot){
+  document.documentElement.dataset.theme=name;
+  document.querySelectorAll('.theme-dot').forEach(d=>d.classList.remove('active'));
+  dot.classList.add('active');
+}
+
+/* ════════════════════════════════════════════════
+   COLLAPSE CARDS
+════════════════════════════════════════════════ */
+function toggleCard(btn){
+  const body=btn.closest('.card').querySelector('.card-body');
+  const collapsed=body.classList.toggle('collapsed');
+  btn.textContent=collapsed?'▸':'▾';
+}
+
+/* ════════════════════════════════════════════════
+   TERMINAL
+════════════════════════════════════════════════ */
+function tsNow(){return new Date().toLocaleTimeString('vi-VN',{hour12:false})}
+function tlog(msg,type='',icon=''){
+  const t=document.getElementById('terminal');
+  const d=document.createElement('div');
+  d.className='log-line'+(type?' '+type:'');
+  d.innerHTML=`<span class="log-ts">${tsNow()}</span>`+(icon?`<span class="log-icon">${icon}</span>`:'')+`<span class="log-msg">${msg}</span>`;
+  t.appendChild(d);t.scrollTop=t.scrollHeight;
+}
+const log   =m=>tlog(m,'','');
+const logOk =m=>tlog(m,'ok','✓');
+const logErr=m=>tlog(m,'err','✗');
+const logInf=m=>tlog(m,'info','›');
+const logWarn=m=>tlog(m,'warn','!');
+const logDim=m=>tlog(m,'dim','');
+const logGold=m=>tlog(m,'gold','★');
+function clearTerminal(){document.getElementById('terminal').innerHTML=''}
+
+/* ════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════ */
+const state={
+  posterType:'player',flowbornJobs:[5],
+  authMode:'har',harData:null,harFileName:'',
+  imgBlob:null,imgOrigBlob:null,
+  stats:{ok:0,fail:0},
+};
+
+/* ════════════════════════════════════════════════
+   STEP 1-2 UI
+════════════════════════════════════════════════ */
+function setPosterType(type,btn){
+  state.posterType=type;
+  document.querySelectorAll('[data-poster]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('jobGroup').classList.toggle('visible',type==='flowborn');
+  updateEncPanel();
+}
+function setJob(jobs,btn){
+  state.flowbornJobs=jobs;
+  btn.closest('.seg-group').querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function setAuthMode(mode,btn){
+  state.authMode=mode;
+  document.getElementById('authSegs').querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('harPanel').style.display=mode==='har'?'block':'none';
+  document.getElementById('linkPanel').style.display=mode==='link'?'block':'none';
+  updateEncPanel();
+}
+function updateEncPanel(){
+  const show=state.authMode==='link'&&state.posterType==='flowborn';
+  document.getElementById('encPanel').style.display=show?'block':'none';
+}
+
+/* ════════════════════════════════════════════════
+   HAR
+════════════════════════════════════════════════ */
+function handleHarDrop(ev){
+  ev.preventDefault();document.getElementById('harZone').classList.remove('dragover');
+  if(ev.dataTransfer.files[0])handleHarFile(ev.dataTransfer.files[0]);
+}
+function handleHarFile(file){
+  if(!file)return;
+  if(!file.name.toLowerCase().endsWith('.har')){logErr('File phải có đuôi .har!');return}
+  state.harFileName=file.name;
+  document.getElementById('harFileName').textContent=file.name;
+  document.getElementById('harChip').style.display='inline-flex';
+  logInf(`Đọc HAR: ${file.name}`);
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      state.harData=parseHar(JSON.parse(e.target.result));
+      logOk(`HAR OK — User: ${state.harData.userId||'?'} | ${state.harData.isFlowborn?'Flowborn':'Player'}`);
+    }catch(err){logErr('Lỗi đọc HAR: '+err.message);state.harData=null}
+  };
+  r.readAsText(file);
+}
+function clearHar(){state.harData=null;document.getElementById('harChip').style.display='none';document.getElementById('harFileInput').value=''}
+
+/* ════════════════════════════════════════════════
+   IMAGE (main)
+════════════════════════════════════════════════ */
+function handleImgDrop(ev){
+  ev.preventDefault();
+  if(ev.dataTransfer.files[0])handleImgFile(ev.dataTransfer.files[0]);
+}
+function handleImgFile(file){
+  if(!file)return;
+  state.imgOrigBlob=state.imgBlob=file;
+  const url=URL.createObjectURL(file);
+  showImgPreview(url,file.name,file.size);
+  loadEditorImage(url);
+}
+async function loadImgFromUrl(){
+  const url=document.getElementById('imgUrlInput').value.trim();
+  if(!url){logErr('Nhập URL ảnh!');return}
+  document.getElementById('urlLoading').classList.add('visible');
+  logInf('Tải ảnh từ URL...');
+  try{
+    let resp=await fetch(`/api/proxy-image?url=${encodeURIComponent(url)}`);
+    if(!resp.ok)resp=await fetch(url);
+    if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+    const blob=await resp.blob();
+    state.imgOrigBlob=state.imgBlob=blob;
+    const oUrl=URL.createObjectURL(blob);
+    const fname=url.split('/').pop().split('?')[0]||'image.jpg';
+    showImgPreview(oUrl,fname,blob.size);
+    loadEditorImage(oUrl);
+    logOk(`Ảnh OK — ${(blob.size/1024).toFixed(1)} KB`);
+  }catch(err){logErr('Lỗi tải ảnh: '+err.message)}
+  finally{document.getElementById('urlLoading').classList.remove('visible')}
+}
+function showImgPreview(url,name,size){
+  document.getElementById('imgPreviewEl').src=url;
+  document.getElementById('imgPreviewWrap').classList.add('visible');
+  document.getElementById('imgInfo').textContent=`📎 ${name}  (${(size/1024).toFixed(1)} KB)`;
+}
+
+/* ════════════════════════════════════════════════
+   IMAGE EDITOR – BG layer
+════════════════════════════════════════════════ */
+const edState={img:null,posX:0,posY:0,scale:1,scaleX:1,scaleY:1,rotate:0,flipH:false,flipV:false,opacity:1,pivotX:.5,pivotY:.5};
+const stickers=[];
+let selectedSticker=-1;
+
+// Build pivot grid
+(function(){
+  const g=document.getElementById('pivotGrid');
+  [[0,0],[.5,0],[1,0],[0,.5],[.5,.5],[1,.5],[0,1],[.5,1],[1,1]].forEach(([px,py],i)=>{
+    const c=document.createElement('div');c.className='pivot-cell'+(px===.5&&py===.5?' active':'');
+    c.title=`Pivot ${px*100}%,${py*100}%`;
+    c.onclick=()=>{
+      document.querySelectorAll('.pivot-cell').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');edState.pivotX=px;edState.pivotY=py;drawCanvas();
+    };g.appendChild(c);
+  });
+})();
+
+function loadEditorImage(src){
+  const img=new Image();img.crossOrigin='anonymous';
+  img.onload=()=>{
+    edState.img=img;
+    const cv=document.getElementById('posterCanvas');
+    edState.scale=Math.min(cv.width/img.naturalWidth,cv.height/img.naturalHeight);
+    edState.scaleX=edState.scaleY=1;edState.posX=edState.posY=0;
+    edState.rotate=0;edState.flipH=edState.flipV=false;edState.opacity=1;
+    edState.pivotX=.5;edState.pivotY=.5;
+    syncSliders();drawCanvas();
+  };
+  img.src=src;
+}
+
+function updateEditor(){
+  edState.posX   =+document.getElementById('sPosX').value;
+  edState.posY   =+document.getElementById('sPosY').value;
+  edState.scale  =document.getElementById('sScale').value/100;
+  edState.rotate =+document.getElementById('sRotate').value;
+  edState.scaleX =document.getElementById('sScaleX').value/100;
+  edState.scaleY =document.getElementById('sScaleY').value/100;
+  edState.opacity=document.getElementById('sOpacity').value/100;
+  document.getElementById('vPosX').textContent =edState.posX+'px';
+  document.getElementById('vPosY').textContent =edState.posY+'px';
+  document.getElementById('vScale').textContent=(edState.scale*100).toFixed(0)+'%';
+  document.getElementById('vRotate').textContent=edState.rotate+'°';
+  document.getElementById('vScaleX').textContent=(edState.scaleX*100).toFixed(0)+'%';
+  document.getElementById('vScaleY').textContent=(edState.scaleY*100).toFixed(0)+'%';
+  document.getElementById('vOpacity').textContent=(edState.opacity*100).toFixed(0)+'%';
+  drawCanvas();
+}
+function syncSliders(){
+  document.getElementById('sPosX').value  =edState.posX;
+  document.getElementById('sPosY').value  =edState.posY;
+  document.getElementById('sScale').value =Math.round(edState.scale*100);
+  document.getElementById('sRotate').value=edState.rotate;
+  document.getElementById('sScaleX').value=Math.round(edState.scaleX*100);
+  document.getElementById('sScaleY').value=Math.round(edState.scaleY*100);
+  document.getElementById('sOpacity').value=Math.round(edState.opacity*100);
+  updateEditor();
+}
+function toggleFlip(axis){
+  if(axis==='H'){edState.flipH=!edState.flipH;document.getElementById('btnFlipH').classList.toggle('active',edState.flipH)}
+  else{edState.flipV=!edState.flipV;document.getElementById('btnFlipV').classList.toggle('active',edState.flipV)}
+  drawCanvas();
+}
+function resetEditor(){
+  Object.assign(edState,{posX:0,posY:0,scaleX:1,scaleY:1,rotate:0,flipH:false,flipV:false,opacity:1,pivotX:.5,pivotY:.5});
+  document.getElementById('btnFlipH').classList.remove('active');
+  document.getElementById('btnFlipV').classList.remove('active');
+  document.querySelectorAll('.pivot-cell').forEach((c,i)=>c.classList.toggle('active',i===4));
+  if(edState.img){
+    const cv=document.getElementById('posterCanvas');
+    edState.scale=Math.min(cv.width/edState.img.naturalWidth,cv.height/edState.img.naturalHeight);
+  }
+  syncSliders();
+}
+
+/* ════════════════════════════════════════════════
+   LAYER TABS
+════════════════════════════════════════════════ */
+function selectLayer(layer){
+  document.getElementById('tabBg').classList.toggle('active',layer==='bg');
+  document.getElementById('tabSticker').classList.toggle('active',layer==='sticker');
+  document.getElementById('bgControls').style.display=layer==='bg'?'block':'none';
+  document.getElementById('stickerControls').style.display=layer==='sticker'?'block':'none';
+}
+
+/* ════════════════════════════════════════════════
+   STICKER SYSTEM
+════════════════════════════════════════════════ */
+let _stickerCounter=0;
+function addSticker(imgEl,label){
+  const cv=document.getElementById('posterCanvas');
+  const sc=Math.min(cv.width/imgEl.naturalWidth,cv.height/imgEl.naturalHeight)*0.4;
+  const s={id:_stickerCounter++,img:imgEl,x:cv.width/2,y:cv.height/2,scale:sc,rotate:0,flipH:false,flipV:false,opacity:1,label:label||'Sticker'};
+  stickers.push(s);
+  selectedSticker=stickers.length-1;
+  renderStickerList();drawCanvas();
+  selectLayer('sticker');
+  syncStickerSliders();
+  logOk(`Thêm sticker: ${s.label}`);
+}
+function addStickerFromFile(file){
+  if(!file)return;
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+  img.onload=()=>addSticker(img,file.name);
+  img.src=url;
+}
+function renderStickerList(){
+  const list=document.getElementById('stickerList');
+  if(!stickers.length){list.innerHTML='<div style="font-size:11px;color:var(--text3);padding:8px 0">Chưa có sticker — tìm ảnh Pinterest hoặc upload</div>';return}
+  list.innerHTML='';
+  stickers.forEach((s,i)=>{
+    const thumb=document.createElement('canvas');thumb.width=32;thumb.height=32;
+    const tc=thumb.getContext('2d');tc.drawImage(s.img,0,0,32,32);
+    const item=document.createElement('div');
+    item.className='sticker-item'+(i===selectedSticker?' active':'');
+    item.innerHTML=`<img class="sticker-thumb" src="${thumb.toDataURL()}" alt=""><div class="sticker-info"><div class="sticker-name">${s.label}</div></div><button class="sticker-del" onclick="event.stopPropagation();deleteSticker(${i})">✕</button>`;
+    item.onclick=()=>{selectedSticker=i;renderStickerList();syncStickerSliders();document.getElementById('selectedCtrl').classList.add('visible');drawCanvas()};
+    list.appendChild(item);
+  });
+  document.getElementById('selectedCtrl').classList.toggle('visible',selectedSticker>=0&&selectedSticker<stickers.length);
+}
+function deleteSticker(i){
+  stickers.splice(i,1);
+  if(selectedSticker>=stickers.length)selectedSticker=stickers.length-1;
+  renderStickerList();drawCanvas();
+}
+function deleteSelectedSticker(){if(selectedSticker>=0)deleteSticker(selectedSticker)}
+function syncStickerSliders(){
+  if(selectedSticker<0||selectedSticker>=stickers.length)return;
+  const s=stickers[selectedSticker];
+  document.getElementById('ssScale').value=Math.round(s.scale*100);
+  document.getElementById('ssRotate').value=Math.round(s.rotate);
+  document.getElementById('ssOpacity').value=Math.round(s.opacity*100);
+  document.getElementById('svScale').textContent=Math.round(s.scale*100)+'%';
+  document.getElementById('svRotate').textContent=Math.round(s.rotate)+'°';
+  document.getElementById('svOpacity').textContent=Math.round(s.opacity*100)+'%';
+  document.getElementById('sbtnFlipH').classList.toggle('active',s.flipH);
+  document.getElementById('sbtnFlipV').classList.toggle('active',s.flipV);
+}
+function updateSelectedSticker(){
+  if(selectedSticker<0||selectedSticker>=stickers.length)return;
+  const s=stickers[selectedSticker];
+  s.scale  =document.getElementById('ssScale').value/100;
+  s.rotate =+document.getElementById('ssRotate').value;
+  s.opacity=document.getElementById('ssOpacity').value/100;
+  document.getElementById('svScale').textContent=Math.round(s.scale*100)+'%';
+  document.getElementById('svRotate').textContent=Math.round(s.rotate)+'°';
+  document.getElementById('svOpacity').textContent=Math.round(s.opacity*100)+'%';
+  drawCanvas();
+}
+function toggleStickerFlip(axis){
+  if(selectedSticker<0)return;
+  const s=stickers[selectedSticker];
+  if(axis==='H'){s.flipH=!s.flipH;document.getElementById('sbtnFlipH').classList.toggle('active',s.flipH)}
+  else{s.flipV=!s.flipV;document.getElementById('sbtnFlipV').classList.toggle('active',s.flipV)}
+  drawCanvas();
+}
+
+/* ════════════════════════════════════════════════
+   CANVAS DRAW
+════════════════════════════════════════════════ */
+function drawCanvas(){
+  const cv=document.getElementById('posterCanvas');
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  // BG layer
+  if(edState.img){
+    const cx=cv.width/2+edState.posX,cy=cv.height/2+edState.posY;
+    ctx.save();ctx.globalAlpha=edState.opacity;
+    ctx.translate(cx,cy);ctx.rotate(edState.rotate*Math.PI/180);
+    ctx.scale(edState.scale*edState.scaleX*(edState.flipH?-1:1),edState.scale*edState.scaleY*(edState.flipV?-1:1));
+    ctx.drawImage(edState.img,-edState.img.naturalWidth*edState.pivotX,-edState.img.naturalHeight*edState.pivotY,edState.img.naturalWidth,edState.img.naturalHeight);
+    ctx.restore();
+  }
+  // Sticker layers
+  stickers.forEach((s,i)=>{
+    ctx.save();ctx.globalAlpha=s.opacity;
+    ctx.translate(s.x,s.y);ctx.rotate(s.rotate*Math.PI/180);
+    ctx.scale(s.scale*(s.flipH?-1:1),s.scale*(s.flipV?-1:1));
+    ctx.drawImage(s.img,-s.img.naturalWidth/2,-s.img.naturalHeight/2,s.img.naturalWidth,s.img.naturalHeight);
+    ctx.restore();
+    // Selection handles
+    if(i===selectedSticker){
+      const hw=s.img.naturalWidth*s.scale/2,hh=s.img.naturalHeight*s.scale/2;
+      ctx.save();ctx.translate(s.x,s.y);ctx.rotate(s.rotate*Math.PI/180);
+      ctx.strokeStyle='rgba(56,189,248,.8)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+      ctx.strokeRect(-hw,-hh,hw*2,hh*2);ctx.restore();
+    }
+  });
+}
+
+/* ════════════════════════════════════════════════
+   CANVAS TOUCH / MOUSE — sticker drag + BG drag
+════════════════════════════════════════════════ */
+(function(){
+  const cv=document.getElementById('posterCanvas');
+  // sticker drag
+  let dragging=false,dragIdx=-1,dsx=0,dsy=0,dox=0,doy=0;
+  // BG drag
+  let draggingBG=false,bgSX=0,bgSY=0,bgOX=0,bgOY=0;
+  // pinch
+  let lastPinchDist=null,pinchTarget=''; // 'sticker' | 'bg'
+
+  function canvasXY(clientX,clientY){
+    const r=cv.getBoundingClientRect();
+    return [(clientX-r.left)*(cv.width/r.width),(clientY-r.top)*(cv.height/r.height)];
+  }
+  function hitSticker(mx,my){
+    for(let i=stickers.length-1;i>=0;i--){
+      const s=stickers[i];
+      const dx=mx-s.x,dy=my-s.y;
+      const cos=Math.cos(-s.rotate*Math.PI/180),sin=Math.sin(-s.rotate*Math.PI/180);
+      const lx=cos*dx-sin*dy,ly=sin*dx+cos*dy;
+      const hw=s.img.naturalWidth*s.scale/2,hh=s.img.naturalHeight*s.scale/2;
+      if(Math.abs(lx)<hw&&Math.abs(ly)<hh)return i;
+    }return -1;
+  }
+
+  function pdown(mx,my){
+    const idx=hitSticker(mx,my);
+    if(idx>=0){
+      dragging=true;dragIdx=idx;selectedSticker=idx;
+      dsx=mx;dsy=my;dox=stickers[idx].x;doy=stickers[idx].y;
+      renderStickerList();syncStickerSliders();
+      document.getElementById('selectedCtrl').classList.add('visible');
+      cv.style.cursor='grabbing';
+    } else {
+      selectedSticker=-1;
+      renderStickerList();
+      document.getElementById('selectedCtrl').classList.remove('visible');
+      if(edState.img){ // drag BG image
+        draggingBG=true;
+        bgSX=mx;bgSY=my;bgOX=edState.posX;bgOY=edState.posY;
+        cv.style.cursor='grabbing';
+      }
+    }
+    drawCanvas();
+  }
+
+  function pmove(mx,my){
+    if(dragging){
+      stickers[dragIdx].x=dox+(mx-dsx);
+      stickers[dragIdx].y=doy+(my-dsy);
+      drawCanvas();
+    } else if(draggingBG){
+      edState.posX=bgOX+(mx-bgSX);
+      edState.posY=bgOY+(my-bgSY);
+      // sync sliders without re-reading them
+      document.getElementById('sPosX').value=edState.posX;
+      document.getElementById('sPosY').value=edState.posY;
+      document.getElementById('vPosX').textContent=Math.round(edState.posX)+'px';
+      document.getElementById('vPosY').textContent=Math.round(edState.posY)+'px';
+      drawCanvas();
+    }
+  }
+
+  function pup(){
+    dragging=false;draggingBG=false;
+    cv.style.cursor='';
+  }
+
+  // mouse cursor hint
+  cv.addEventListener('mousemove',e=>{
+    const[mx,my]=canvasXY(e.clientX,e.clientY);
+    if(!dragging&&!draggingBG){
+      cv.style.cursor=hitSticker(mx,my)>=0?'grab':(edState.img?'move':'default');
+    }
+    pmove(mx,my);
+  });
+  cv.addEventListener('mousedown',e=>{const[mx,my]=canvasXY(e.clientX,e.clientY);pdown(mx,my)});
+  window.addEventListener('mouseup',pup);
+
+  cv.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    if(e.touches.length===1){
+      const t=e.touches[0];const[mx,my]=canvasXY(t.clientX,t.clientY);pdown(mx,my);
+    } else if(e.touches.length===2){
+      lastPinchDist=null;
+      pinchTarget=selectedSticker>=0?'sticker':'bg';
+    }
+  },{passive:false});
+
+  cv.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    if(e.touches.length===2){
+      const dx=e.touches[0].clientX-e.touches[1].clientX;
+      const dy=e.touches[0].clientY-e.touches[1].clientY;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(lastPinchDist!==null){
+        const ratio=dist/lastPinchDist;
+        if(pinchTarget==='sticker'&&selectedSticker>=0){
+          stickers[selectedSticker].scale=Math.max(.05,stickers[selectedSticker].scale*ratio);
+          syncStickerSliders();
+        } else if(edState.img){ // pinch scales BG image
+          edState.scale=Math.max(.01,edState.scale*ratio);
+          document.getElementById('sScale').value=Math.round(edState.scale*100);
+          document.getElementById('vScale').textContent=Math.round(edState.scale*100)+'%';
+        }
+      }
+      lastPinchDist=dist;drawCanvas();
+    } else if(e.touches.length===1){
+      lastPinchDist=null;
+      const t=e.touches[0];const[mx,my]=canvasXY(t.clientX,t.clientY);pmove(mx,my);
+    }
+  },{passive:false});
+  cv.addEventListener('touchend',e=>{e.preventDefault();pup();lastPinchDist=null},{passive:false});
+})();
+
+/* canvas export */
+async function exportEdited(outW,outH){
+  if(!edState.img)return state.imgOrigBlob;
+  const exp=document.createElement('canvas');exp.width=outW;exp.height=outH;
+  const ctx=exp.getContext('2d');
+  const cv=document.getElementById('posterCanvas');
+  const sr=outW/cv.width;
+  ctx.save();ctx.globalAlpha=edState.opacity;
+  const cx=outW/2+edState.posX*sr,cy=outH/2+edState.posY*sr;
+  ctx.translate(cx,cy);ctx.rotate(edState.rotate*Math.PI/180);
+  ctx.scale(edState.scale*edState.scaleX*(edState.flipH?-1:1)*sr,edState.scale*edState.scaleY*(edState.flipV?-1:1)*sr);
+  ctx.drawImage(edState.img,-edState.img.naturalWidth*edState.pivotX,-edState.img.naturalHeight*edState.pivotY,edState.img.naturalWidth,edState.img.naturalHeight);
+  ctx.restore();
+  // stickers
+  stickers.forEach(s=>{
+    ctx.save();ctx.globalAlpha=s.opacity;
+    ctx.translate(s.x*sr,s.y*sr);ctx.rotate(s.rotate*Math.PI/180);
+    ctx.scale(s.scale*sr*(s.flipH?-1:1),s.scale*sr*(s.flipV?-1:1));
+    ctx.drawImage(s.img,-s.img.naturalWidth/2,-s.img.naturalHeight/2,s.img.naturalWidth,s.img.naturalHeight);
+    ctx.restore();
+  });
+  return new Promise(res=>exp.toBlob(res,'image/png'));
+}
+function exportCanvas(){
+  const cv=document.getElementById('posterCanvas');
+  const a=document.createElement('a');a.download='poster_preview.png';a.href=cv.toDataURL('image/png');a.click();
+}
+
+/* ════════════════════════════════════════════════
+   PINTEREST SEARCH
+════════════════════════════════════════════════ */
+let _currentPin=null; // {images, title, description}
+
+async function pinSearch(){
+  const q=document.getElementById('pinSearchInput').value.trim();
+  if(!q){logErr('Nhập từ khoá tìm kiếm!');return}
+  const grid=document.getElementById('pinGrid');
+  grid.innerHTML='<div class="pin-loading">⏳ Đang tìm kiếm...</div>';
+  logInf(`Pinterest: tìm "${q}"...`);
+  try{
+    const resp=await fetch('/api/pinterest/search',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({q,limit:24})
+    });
+    const data=await resp.json();
+    if(!data.success)throw new Error(data.error||'Pinterest API lỗi');
+    const pins=data.data.pins;
+    logOk(`Tìm thấy ${pins.length} kết quả`);
+    renderPinGrid(pins);
+  }catch(err){
+    logErr('Pinterest: '+err.message);
+    grid.innerHTML=`<div class="pin-none">❌ ${err.message}</div>`;
+  }
+}
+function renderPinGrid(pins){
+  const grid=document.getElementById('pinGrid');
+  if(!pins.length){grid.innerHTML='<div class="pin-none">Không tìm thấy ảnh nào</div>';return}
+  grid.innerHTML='';
+  pins.forEach(pin=>{
+    const thumb=pin.images.thumb||pin.images.medium;
+    if(!thumb)return;
+    const item=document.createElement('div');item.className='pin-thumb';
+    item.innerHTML=`<img src="/api/proxy-image?url=${encodeURIComponent(thumb)}" alt="${pin.title||''}" loading="lazy">`;
+    item.onclick=()=>openPinModal(pin);
+    grid.appendChild(item);
+  });
+}
+
+function openPinModal(pin){
+  _currentPin=pin;
+  const large=pin.images.large||pin.images.medium||pin.images.thumb;
+  document.getElementById('modalImg').src=`/api/proxy-image?url=${encodeURIComponent(large)}`;
+  document.getElementById('modalTitle').textContent=pin.title||'(Không có tiêu đề)';
+  document.getElementById('modalDesc').textContent=pin.description||'';
+  document.getElementById('removeBgToggle').checked=false;
+  document.getElementById('modalProcessing').classList.remove('visible');
+  document.getElementById('pinModal').classList.add('open');
+}
+function closePinModal(){
+  document.getElementById('pinModal').classList.remove('open');
+  _currentPin=null;
+}
+async function getPinImageBlob(){
+  if(!_currentPin)return null;
+  const url=_currentPin.images.original||_currentPin.images.large||_currentPin.images.medium;
+  const resp=await fetch(`/api/proxy-image?url=${encodeURIComponent(url)}`);
+  if(!resp.ok)throw new Error('Không tải được ảnh Pinterest');
+  return await resp.blob();
+}
+async function maybeRemoveBg(blob){
+  if(!document.getElementById('removeBgToggle').checked)return blob;
+  document.getElementById('modalProcessing').classList.add('visible');
+  logInf('Đang xoá nền...');
+  try{
+    const formData=new FormData();
+    formData.append('file',blob,'image.png');
+    const resp=await fetch('/api/removebg',{method:'POST',body:formData});
+    document.getElementById('modalProcessing').classList.remove('visible');
+    if(!resp.ok){
+      const txt=await resp.text();
+      logWarn('⚠ Xoá nền lỗi ('+resp.status+'): '+txt.slice(0,80)+' — dùng ảnh gốc');
+      return blob;
+    }
+    const ct=resp.headers.get('Content-Type')||'';
+    if(ct.includes('application/json')){
+      const json=await resp.json();
+      const b64=json.image||json.result||json.data;
+      if(b64){
+        const bin=atob(b64);const arr=new Uint8Array(bin.length);
+        for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+        logOk('Xoá nền thành công ✂');
+        return new Blob([arr],{type:'image/png'});
+      }
+      logWarn('⚠ removebg: không có ảnh trong phản hồi — dùng ảnh gốc');
+      return blob;
+    }
+    logOk('Xoá nền thành công ✂');
+    return await resp.blob();
+  }catch(err){
+    document.getElementById('modalProcessing').classList.remove('visible');
+    logWarn('⚠ Xoá nền lỗi: '+err.message+' — dùng ảnh gốc');
+    return blob; // fallback: trả về ảnh gốc, không crash
+  }
+}
+function blobToImgEl(blob){
+  return new Promise(res=>{
+    const url=URL.createObjectURL(blob);
+    const img=new Image();img.crossOrigin='anonymous';
+    img.onload=()=>res(img);img.src=url;
+  });
+}
+async function addPinAsMain(){
+  if(!_currentPin)return;
+  try{
+    logInf('Tải ảnh Pinterest...');
+    let blob=await getPinImageBlob();
+    blob=await maybeRemoveBg(blob);
+    state.imgOrigBlob=state.imgBlob=blob;
+    const url=URL.createObjectURL(blob);
+    showImgPreview(url,_currentPin.title||'Pinterest',blob.size);
+    loadEditorImage(url);
+    logOk('Đã đặt làm ảnh chính');
+    closePinModal();
+  }catch(err){
+    document.getElementById('modalProcessing').classList.remove('visible');
+    logErr(err.message);
+  }
+}
+async function addPinAsSticker(){
+  if(!_currentPin)return;
+  try{
+    logInf('Tải ảnh sticker...');
+    let blob=await getPinImageBlob();
+    blob=await maybeRemoveBg(blob);
+    const img=await blobToImgEl(blob);
+    addSticker(img,_currentPin.title||'Pinterest sticker');
+    closePinModal();
+  }catch(err){
+    document.getElementById('modalProcessing').classList.remove('visible');
+    logErr(err.message);
+  }
+}
+
+/* ════════════════════════════════════════════════
+   HAR PARSER
+════════════════════════════════════════════════ */
+const KEEP_HEADERS=new Set(['msdk-channelid','camp-source','logicworldid','user-agent','msdk-gameid','msdk-itopencodeparam','areaid','aov-region','aov-language','camp-authtype','origin','referer','accept-language','accept-encoding','connection','encodeparam','sec-ch-ua','sec-ch-ua-platform','sec-ch-ua-mobile']);
+function parseHar(har){
+  const info={headers:{},accessToken:null,userId:null,posterPathPrefix:null,posterInfo:null,apiBase:'https://kgvn-api.mobagarena.com',isFlowborn:false,mainJob:5};
+  for(const e of har.log.entries){
+    const url=e.request.url,method=e.request.method;
+    if(!info.accessToken&&url.includes('access_token=')){const m=url.match(/access_token=([a-f0-9]{40,})/i);if(m)info.accessToken=m[1]}
+    if(method==='POST'&&url.includes('kgvn-api.mobagarena.com')){for(const h of e.request.headers){const k=h.name.toLowerCase();if(KEEP_HEADERS.has(k)&&!info.headers[k])info.headers[k]=h.value}}
+    if(method==='PUT'&&url.includes('cos.ap-singapore')&&!info.posterPathPrefix){try{const p=new URL(url).pathname;const m=p.match(/^(\/\d+\/\d+\/[a-f0-9]+)/);if(m)info.posterPathPrefix=m[1]}catch(e){}}
+    if(method==='POST'&&url.includes('saveposter')){const b=e.request.postData?.text||'';if(b){try{info.posterInfo=JSON.parse(b)}catch(e){}}}
+    if(method==='POST'&&url.includes('inmail')&&!info.userId){const b=e.request.postData?.text||'';if(b){try{const d=JSON.parse(b);if(d.userId)info.userId=d.userId}catch(e){}}}
+    if(method==='POST'&&url.includes('getselfuserinfo')&&!info.userId){const r=e.response?.content?.text||'';if(r){try{const d=JSON.parse(r);const u=d?.data?.role?.campRoleid;if(u)info.userId=u}catch(e){}}}
+  }
+  info.isFlowborn=har.log.entries.some(e=>e.request.url.includes('flowborn')&&e.request.url.includes('kgvn-api.mobagarena.com'));
+  info.mainJob=info.posterInfo?.mainJob??5;
+  return info;
+}
+
+/* ════════════════════════════════════════════════
+   LINK PARSER
+════════════════════════════════════════════════ */
+function parseLink(link){
+  const url=new URL(link);const p=Object.fromEntries(url.searchParams);
+  const accessToken=p.access_token||'';
+  if(!accessToken)throw new Error('Không tìm thấy access_token!');
+  const partition=p.partition||'',aovAreaid=p.aov_areaid||'1',aovRegion=p.aov_region||'';
+  const gameid=p.gameid||'1137',channelid=p.channelid||'10',lang=p.lang||'VN';
+  const itopencodeparam=p.itopencodeparam||'',osId=p.os||'2',version=p.version||'5.36.000.9136';
+  const seq=p.seq||'',heroJob=parseInt(p.heroJob||'5');
+  const isFlowborn=url.pathname.includes('flowborn-poster');
+  let ua;
+  if(isFlowborn){ua='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'}
+  else{
+    let du='';if(seq){const rest=seq.split('-').slice(1).join('-');const m=rest.match(/([A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12})/i);if(m)du=m[1].toUpperCase()}
+    ua=`Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MSDK/${version} mQQAppId/1105779914 mWXAppId/wx7a814e3ceeda8320 mGameId/${gameid}`+(du?` MSDKDeviceModel/${du}`:'');
+  }
+  const headers={'msdk-channelid':channelid,'camp-source':'AOV-CAMP','logicworldid':partition,'user-agent':ua,'msdk-gameid':gameid,'msdk-itopencodeparam':itopencodeparam,'areaid':aovAreaid,'aov-region':aovRegion,'aov-language':lang,'camp-authtype':'msdk','origin':'https://kgvn-camp.mobagarena.com','referer':'https://kgvn-camp.mobagarena.com/','msdk-os':osId,'accept-language':'vi-VN,vi;q=0.9','accept-encoding':'gzip, deflate, br'};
+  if(isFlowborn)Object.assign(headers,{'sec-ch-ua':'"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"','sec-ch-ua-platform':'"Windows"','sec-ch-ua-mobile':'?0'});
+  const enc=document.getElementById('encInput')?.value.trim();if(enc)headers['encodeparam']=enc;
+  return{headers,accessToken,userId:null,posterPathPrefix:null,posterInfo:null,apiBase:'https://kgvn-api.mobagarena.com',isFlowborn,mainJob:heroJob};
+}
+
+/* ════════════════════════════════════════════════
+   COS HMAC-SHA1
+════════════════════════════════════════════════ */
+async function hmacSha1(key,msg){const enc=new TextEncoder();const k=await crypto.subtle.importKey('raw',enc.encode(key),{name:'HMAC',hash:'SHA-1'},false,['sign']);const s=await crypto.subtle.sign('HMAC',k,enc.encode(msg));return[...new Uint8Array(s)].map(b=>b.toString(16).padStart(2,'0')).join('')}
+async function sha1Hex(msg){const enc=new TextEncoder();const b=await crypto.subtle.digest('SHA-1',enc.encode(msg));return[...new Uint8Array(b)].map(b=>b.toString(16).padStart(2,'0')).join('')}
+function qenc(s){return encodeURIComponent(String(s)).replace(/!/g,'%21').replace(/'/g,'%27').replace(/\(/g,'%28').replace(/\)/g,'%29').replace(/\*/g,'%2A')}
+async function cosSign(sId,sKey,method,uri,sHdrs,t0,t1){
+  const kt=`${t0};${t1}`;const sk=await hmacSha1(sKey,kt);
+  const keys=Object.keys(sHdrs).sort();const hl=keys.join(';');const hp=keys.map(k=>`${qenc(k)}=${qenc(sHdrs[k])}`).join('&');
+  const hs=`${method.toLowerCase()}\n${uri}\n\n${hp}\n`;const sh=await sha1Hex(hs);const ss=`sha1\n${kt}\n${sh}\n`;
+  const sig=await hmacSha1(sk,ss);
+  return `q-sign-algorithm=sha1&q-ak=${sId}&q-sign-time=${kt}&q-key-time=${kt}&q-header-list=${hl}&q-url-param-list=&q-signature=${sig}`;
+}
+
+/* ════════════════════════════════════════════════
+   API
+════════════════════════════════════════════════ */
+function buildApiHeaders(info,extra){return{...info.headers,'Content-Type':'application/json','Accept':'*/*','Sec-Fetch-Mode':'cors','Sec-Fetch-Site':'same-site','Sec-Fetch-Dest':'empty',...extra}}
+async function apiPost(info,ep,body={}){
+  const url=`${info.apiBase}${ep}?access_token=${info.accessToken}`;
+  const resp=await fetch(url,{method:'POST',headers:buildApiHeaders(info),body:JSON.stringify(body),credentials:'omit'});
+  if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+  const data=await resp.json();
+  if(data.code!==0)throw new Error(`API code ${data.code}: ${data.msg||''}`);
+  return data.data;
+}
+async function apiCreatePoster(i){return String((await apiPost(i,'/api/game/poster/playerimage/createposter')).posterId)}
+async function apiGetCosCred(i,fn,scene='PlayerimagePoster'){return await apiPost(i,'/api/game/poster/getcoscredential',{scene,fileName:fn})}
+async function apiSavePoster(i,pid,cdn,pfx){
+  const body=i.posterInfo?{...i.posterInfo,posterId:pid,picUrl:`${cdn}${pfx}/`,isApply:true}:{posterId:pid,isApply:true,isShare:true,picUrl:`${cdn}${pfx}/`,picInfo:{bg:{id:'21',picUrl:'https://kg-camp.mobagarena.com/manage/playerimage_official/iDzT817p.png',source:1,width:320,height:503.99,posX:0,posY:0},stickerList:[]}};
+  return await apiPost(i,'/api/game/poster/playerimage/saveposter',body);
+}
+async function apiFbGetCfg(i){const d=await apiPost(i,'/api/game/poster/flowborn/geteditorconfig',{mainJob:i.mainJob});const l=d.baseList||[];if(!l.length)throw new Error('baseList trống');return l[0]}
+async function apiFbSaveEdit(i,cfg){await apiPost(i,'/api/game/poster/flowborn/savepostereditinfo',{mainJob:i.mainJob,picInfo:{bg:{id:'30',picUrl:'https://kg-camp.mobagarena.com/manage/flowborn_official/4uxOQChv.png'},baseInfo:{id:cfg.id,gender:cfg.gender||2,mainJob:i.mainJob,picUrl:cfg.picUrl,skinColor:cfg.skinColor||1},stickerList:[]}})}
+async function apiFbCreate(i){return String((await apiPost(i,'/api/game/poster/flowborn/createposter')).posterId)}
+async function apiFbSave(i,pid,cdn,pfx,cfg){
+  const body=i.posterInfo?{...i.posterInfo,posterId:pid,picUrl:`${cdn}${pfx}/`,isApply:true}:{posterId:pid,isApply:true,isShare:false,mainJob:i.mainJob,picUrl:`${cdn}${pfx}/`,picInfo:{bg:{id:'30',picUrl:'https://kg-camp.mobagarena.com/manage/flowborn_official/4uxOQChv.png'},baseInfo:{id:cfg.id,gender:cfg.gender||2,mainJob:i.mainJob,picUrl:cfg.picUrl,skinColor:cfg.skinColor||1},stickerList:[]}};
+  return await apiPost(i,'/api/game/poster/flowborn/saveposter',body);
+}
+async function uploadCos(cred,buf,ct,ua){
+  const{bucket,appId,region,path,tmpSecretId:sId,tmpSecretKey:sKey,token,startTime,expiration}=cred;
+  const t0=parseInt(startTime);const t1=/^\d+$/.test(String(expiration))?parseInt(expiration):Math.floor(new Date(expiration).getTime()/1000);
+  const host=`${bucket}-${appId}.cos.${region}.myqcloud.com`;
+  const sHdrs={'content-length':String(buf.byteLength),'host':host,'x-cos-forbid-overwrite':'true'};
+  const auth=await cosSign(sId,sKey,'PUT',path,sHdrs,t0,t1);
+  const r=await fetch(`https://${host}${path}`,{method:'PUT',headers:{Host:host,Authorization:auth,'x-cos-security-token':token,'x-cos-forbid-overwrite':'true','Content-Type':ct,'Content-Length':String(buf.byteLength),'Origin':'https://kgvn-camp.mobagarena.com','Referer':'https://kgvn-camp.mobagarena.com/'},body:buf,credentials:'omit'});
+  if(![200,204].includes(r.status))throw new Error(`COS ${r.status}`);
+}
+
+/* ════════════════════════════════════════════════
+   PROGRESS + STATS
+════════════════════════════════════════════════ */
+function setProgress(pct,label){
+  document.getElementById('progressWrap').classList.add('visible');
+  document.getElementById('progressBar').style.width=pct+'%';
+  if(label)document.getElementById('progressLabel').textContent=label;
+}
+function updateStats(){
+  document.getElementById('statOk').textContent=state.stats.ok;
+  document.getElementById('statFail').textContent=state.stats.fail;
+}
+
+/* ════════════════════════════════════════════════
+   MAIN RUN
+════════════════════════════════════════════════ */
+async function runTool(){
+  if(state.authMode==='har'&&!state.harData){logErr('Chưa chọn file HAR!');return}
+  if(state.authMode==='link'){
+    const l=document.getElementById('linkInput').value.trim();
+    if(!l.includes('access_token=')||!l.includes('kgvn-camp.mobagarena.com')){logErr('Link không hợp lệ!');return}
+    state.linkStr=l;
+  }
+  if(!state.imgOrigBlob){logErr('Chưa chọn ảnh poster!');return}
+  const btn=document.getElementById('runBtn');btn.disabled=true;
+  setProgress(0,'Đang chuẩn bị...');
+  logGold('══════════════════════════════');
+  logGold('   AoV Poster Changer — Start');
+  logGold('══════════════════════════════');
+  try{
+    let info=state.authMode==='har'?state.harData:parseLink(state.linkStr);
+    info.apiBase='https://kgvn-api.mobagarena.com';
+    logOk(`Auth OK — User: ${info.userId||'?'}`);setProgress(8,'Auth xong...');
+    logInf('Chuẩn bị ảnh...');
+    const largeBuf=await state.imgOrigBlob.arrayBuffer();
+    const thumbBlob=edState.img?await exportEdited(400,628):state.imgOrigBlob;
+    const thumbBuf=await thumbBlob.arrayBuffer();
+    const imgCt=state.imgOrigBlob.type.includes('png')?'image/png':'image/jpeg';
+    logOk(`Ảnh — Large: ${(largeBuf.byteLength/1024).toFixed(1)}KB | Thumb: ${(thumbBuf.byteLength/1024).toFixed(1)}KB`);
+    setProgress(15,'Ảnh OK...');
+    const ua=info.headers?.['user-agent']||'Mozilla/5.0';
+    if(state.posterType==='player'){
+      await runPlayerFlow(info,largeBuf,thumbBuf,imgCt,ua);
+    }else{
+      for(const job of state.flowbornJobs){
+        if(state.flowbornJobs.length>1)logInf(`── Flowborn mainJob ${job} ──`);
+        await runFlowbornFlow({...info,mainJob:job},largeBuf,thumbBuf,imgCt,ua);
+      }
+    }
+  }catch(err){
+    logErr('Lỗi: '+err.message);
+    if(err.message.includes('fetch')||err.message.includes('CORS'))logWarn('⚠ CORS — mở Chrome với --disable-web-security hoặc dùng CORS extension');
+    state.stats.fail++;updateStats();
+  }finally{btn.disabled=false;setProgress(100,'Xong!')}
+}
+
+async function runPlayerFlow(info,largeBuf,thumbBuf,imgCt,ua){
+  logInf('Tạo poster...');const pid=await apiCreatePoster(info);logOk(`Poster ID: ${pid}`);setProgress(30,'');
+  logInf('Lấy credential _large...');const cL=await apiGetCosCred(info,`0/1/${pid}_large.png`);logOk('Cred _large OK');setProgress(40,'');
+  logInf('Lấy credential .png...');const cP=await apiGetCosCred(info,`0/1/${pid}.png`);logOk('Cred .png OK');setProgress(50,'');
+  logInf('Upload _large...');await uploadCos(cL,largeBuf,imgCt,ua);logOk('Upload _large OK');setProgress(65,'');
+  logInf('Upload .png...');await uploadCos(cP,thumbBuf,'image/png',ua);logOk('Upload .png OK');setProgress(78,'');
+  const cdn=cP.cdnHost||'https://kg-camp-ugc.mobagarena.com';
+  const parts=cP.path.split('/');const pfx=parts.slice(0,parts.length-3).join('/')||(info.posterPathPrefix||'');
+  logInf('Lưu poster...');await apiSavePoster(info,pid,cdn,pfx);logOk('savePoster OK');setProgress(100,'✅');
+  logGold(`🎉 Thành công! (ID=${pid})`);state.stats.ok++;updateStats();
+}
+async function runFlowbornFlow(info,largeBuf,thumbBuf,imgCt,ua){
+  logInf(`getEditorConfig job ${info.mainJob}...`);const cfg=await apiFbGetCfg(info);logOk(`baseInfo id=${cfg.id}`);setProgress(20,'');
+  logInf('savepostereditinfo...');await apiFbSaveEdit(info,cfg);logOk('editinfo OK');setProgress(28,'');
+  logInf('createposter Flowborn...');const pid=await apiFbCreate(info);logOk(`Poster ID: ${pid}`);setProgress(35,'');
+  const pfxCos=`${info.mainJob}/1`;
+  logInf('Credential _large...');const cL=await apiGetCosCred(info,`${pfxCos}/${pid}_large.png`,'FlowbornPoster');logOk('Cred _large OK');setProgress(44,'');
+  logInf('Credential .png...');const cP=await apiGetCosCred(info,`${pfxCos}/${pid}.png`,'FlowbornPoster');logOk('Cred .png OK');setProgress(52,'');
+  logInf('Upload _large...');await uploadCos(cL,largeBuf,imgCt,ua);logOk('Upload _large OK');setProgress(65,'');
+  logInf('Upload .png...');await uploadCos(cP,thumbBuf,'image/png',ua);logOk('Upload .png OK');setProgress(78,'');
+  const cdn=cP.cdnHost||'https://kg-camp-ugc.mobagarena.com';
+  const parts=cP.path.split('/');const pfx=parts.slice(0,parts.length-3).join('/');
+  logInf('savePoster Flowborn...');await apiFbSave(info,pid,cdn,pfx,cfg);logOk('savePoster OK');setProgress(100,'✅');
+  logGold(`🎉 Flowborn OK! (ID=${pid})`);state.stats.ok++;updateStats();
+}
+
+/* ════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════ */
+drawCanvas();
+logDim('AoV Poster Changer — sẵn sàng.');
+logDim('──────────────────────────────');
+logInf('Chọn loại → xác thực → ảnh → chạy.');
+logInf('Pinterest: tìm ảnh và chèn sticker trực tiếp lên poster.');
+logWarn('Nếu lỗi CORS: chạy Chrome với --disable-web-security');
+</script>
+</body>
+</html>
