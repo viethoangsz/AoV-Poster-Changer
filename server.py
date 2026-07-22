@@ -9,7 +9,7 @@ import ssl
 import urllib.error
 import urllib.parse
 import urllib.request
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from io import BytesIO
 
 # ── Pinterest credentials (hardcoded) ────────────────────────────────────────
@@ -257,6 +257,6 @@ class Handler(SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5000))
-    server = HTTPServer(("0.0.0.0", port), Handler)
+    server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
     print(f"AoV Poster Changer server → http://0.0.0.0:{port}")
     server.serve_forever()
