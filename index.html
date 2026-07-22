@@ -442,6 +442,86 @@ header{
 @keyframes logIn{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:translateX(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── Undo/Redo bar ───────────────────────────────────────────────────────── */
+.history-bar{display:flex;gap:5px;align-items:center;margin-bottom:8px}
+.hist-btn{padding:4px 11px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text3);cursor:pointer;font-size:11px;transition:all .15s}
+.hist-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.hist-btn:disabled{opacity:.3;cursor:not-allowed}
+.hist-label{font-size:10px;color:var(--text3);margin-left:2px;flex:1;text-align:right}
+
+/* ── Before/After preview modal ─────────────────────────────────────────── */
+.ba-wrap{position:relative;width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--bg2);cursor:col-resize;user-select:none;display:none;line-height:0}
+.ba-wrap.ready{display:block}
+.ba-before,.ba-after{display:block;width:100%;max-height:340px;object-fit:contain}
+.ba-after{position:absolute;top:0;left:0;height:100%;clip-path:inset(0 50% 0 0)}
+.ba-divider{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--accent);transform:translateX(-50%);pointer-events:none}
+.ba-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--accent);color:#fff;border-radius:20px;padding:5px 10px;font-size:11px;pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.ba-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:5px;padding:0 3px}
+.ba-loading{text-align:center;padding:40px;font-size:12px;color:var(--text3);animation:pulse 1.2s infinite;display:none}
+.ba-loading.visible{display:block}
+
+/* ── Filter controls ─────────────────────────────────────────────────────── */
+.filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+@media(max-width:500px){.filter-grid{grid-template-columns:1fr}}
+.filter-reset{margin-top:8px;padding:4px 13px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text3);cursor:pointer;font-size:11px;transition:all .15s}
+.filter-reset:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── Text layer ──────────────────────────────────────────────────────────── */
+.text-add-row{display:flex;gap:6px;align-items:center;margin-bottom:7px}
+.text-color-pick{width:30px;height:30px;border-radius:6px;border:1px solid var(--border2);cursor:pointer;padding:2px;background:transparent;flex-shrink:0}
+.text-list{display:flex;flex-direction:column;gap:5px}
+.text-item{display:flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:5px 8px;cursor:pointer;transition:all .15s}
+.text-item:hover{border-color:var(--accent)}
+.text-item.active{border-color:var(--accent);background:var(--glow)}
+.text-preview{flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:var(--bg3);font-weight:700;overflow:hidden;font-size:14px}
+.text-item-name{flex:1;min-width:0;font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.text-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:2px;transition:color .15s;flex-shrink:0}
+.text-del:hover{color:var(--red)}
+.text-sel-ctrl{margin-top:8px;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:none}
+.text-sel-ctrl.visible{display:block}
+.font-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.font-btn{padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:transparent;color:var(--text3);cursor:pointer;font-size:11px;transition:all .15s}
+.font-btn:hover{border-color:var(--accent);color:var(--accent)}
+.font-btn.active{border-color:var(--accent);color:var(--accent);background:var(--glow)}
+
+/* ── Border/Frame ────────────────────────────────────────────────────────── */
+.border-panel{margin-top:9px;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:none}
+.border-panel.visible{display:block}
+.bs-row{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0}
+.bs-btn{padding:4px 10px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text3);cursor:pointer;font-size:11px;transition:all .15s}
+.bs-btn:hover{border-color:var(--accent);color:var(--accent)}
+.bs-btn.active{border-color:var(--accent);color:var(--accent);background:var(--glow)}
+.bc-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:6px 0}
+.bc-dot{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+.bc-dot:hover{transform:scale(1.2)}
+.bc-dot.active{border-color:#fff;box-shadow:0 0 5px rgba(255,255,255,.4)}
+.bc-custom{width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);cursor:pointer;padding:1px;background:transparent}
+
+/* ── Preset ──────────────────────────────────────────────────────────────── */
+.preset-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.preset-save-btn{padding:4px 12px;border:1px solid var(--gold);border-radius:6px;background:rgba(245,197,24,.08);color:var(--gold);cursor:pointer;font-size:11px;transition:all .15s;white-space:nowrap}
+.preset-save-btn:hover{background:rgba(245,197,24,.2)}
+.preset-chips{display:flex;gap:5px;flex-wrap:wrap;flex:1}
+.preset-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border:1px solid var(--border2);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;font-size:11px;transition:all .15s}
+.preset-chip:hover{border-color:var(--accent);color:var(--accent)}
+.preset-chip .pc-del{color:var(--text3);font-size:13px;margin-left:1px;line-height:1}
+.preset-chip .pc-del:hover{color:var(--red)}
+
+/* ── Auto-detect badge ───────────────────────────────────────────────────── */
+.detect-badge{display:none;margin-top:7px;padding:6px 10px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:7px;font-size:11px;color:var(--green)}
+.detect-badge.visible{display:block}
+
+/* ── Main image actions ──────────────────────────────────────────────────── */
+.main-img-actions{display:none;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.main-img-actions.visible{display:flex}
+.mia-btn{padding:5px 12px;border:1px solid var(--border2);border-radius:7px;background:transparent;color:var(--text2);cursor:pointer;font-size:11px;transition:all .15s}
+.mia-btn:hover{border-color:var(--accent);color:var(--accent)}
+.mia-btn.gold{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.08)}
+.mia-btn.gold:hover{background:rgba(245,197,24,.2)}
+.mia-status{font-size:11px;color:var(--text3);margin-top:5px;display:none;animation:pulse 1.2s infinite}
+.mia-status.on{display:block;animation:none}
+.mia-status.loading{display:block}
 </style>
 </head>
 <body>
@@ -531,13 +611,14 @@ header{
         </div>
       </div>
       <div id="linkPanel" style="display:none">
-        <input class="inp" id="linkInput" type="text" placeholder="https://kgvn-camp.mobagarena.com/app/player-poster?access_token=..."/>
+        <input class="inp" id="linkInput" type="text" placeholder="https://kgvn-camp.mobagarena.com/app/player-poster?access_token=..." oninput="autoDetectLink(this.value)"/>
         <div style="font-size:10px;color:var(--text3);margin-top:4px">Android: AoV → Camp → Poster → copy URL · iOS: Charles/Stream intercept</div>
         <div id="encPanel" style="display:none;margin-top:9px">
           <div style="font-size:10px;color:var(--yellow);margin-bottom:4px">⚠️ Flowborn cần header <b>encodeparam</b> (lấy từ F12 → Network)</div>
           <input class="inp" id="encInput" type="text" placeholder="encodeparam (bỏ trống nếu không có)"/>
         </div>
       </div>
+      <div class="detect-badge" id="detectBadge"></div>
     </div>
   </div>
 
@@ -569,6 +650,12 @@ header{
         <div class="img-preview-box"><img id="imgPreviewEl" src="" alt="preview"></div>
         <div id="imgInfo" style="font-size:10px;color:var(--text3);margin-top:3px"></div>
       </div>
+      <div class="main-img-actions" id="mainImgActions">
+        <button class="mia-btn" onclick="mainImgRemoveBg()">✂ Xoá nền</button>
+        <button class="mia-btn" id="btnRestoreImg" onclick="mainImgRestore()" style="display:none">↺ Khôi phục gốc</button>
+        <button class="mia-btn gold" onclick="showBeforeAfter()">🔍 Xem trước làm nét</button>
+      </div>
+      <div class="mia-status" id="miaStatus"></div>
     </div>
   </div>
 
@@ -600,6 +687,12 @@ header{
       <div class="editor-wrap">
         <!-- Canvas -->
         <div class="canvas-wrap">
+          <!-- Undo / Redo -->
+          <div class="history-bar">
+            <button class="hist-btn" id="undoBtn" onclick="undo()" disabled title="Ctrl+Z">↩ Undo</button>
+            <button class="hist-btn" id="redoBtn" onclick="redo()" disabled title="Ctrl+Y">↪ Redo</button>
+            <span class="hist-label" id="histLabel"></span>
+          </div>
           <canvas id="posterCanvas" class="poster-canvas" width="400" height="628"></canvas>
           <div class="canvas-size-label" id="canvasLabel">Preview 400×628</div>
           <!-- Aspect ratio presets -->
@@ -619,9 +712,11 @@ header{
         <!-- Controls -->
         <div style="width:100%">
           <!-- Layer tabs -->
-          <div style="display:flex;gap:5px;margin-bottom:8px">
-            <button class="inp-btn active" id="tabBg" onclick="selectLayer('bg')" style="flex:1;font-size:11px">🖼 Ảnh chính</button>
-            <button class="inp-btn" id="tabSticker" onclick="selectLayer('sticker')" style="flex:1;font-size:11px">🎨 Sticker</button>
+          <div style="display:flex;gap:4px;margin-bottom:9px;flex-wrap:wrap">
+            <button class="inp-btn active" id="tabBg" onclick="selectLayer('bg')" style="flex:1;font-size:11px;min-width:60px">🖼 Ảnh</button>
+            <button class="inp-btn" id="tabFilter" onclick="selectLayer('filter')" style="flex:1;font-size:11px;min-width:60px">🎨 Filter</button>
+            <button class="inp-btn" id="tabText" onclick="selectLayer('text')" style="flex:1;font-size:11px;min-width:60px">📝 Text</button>
+            <button class="inp-btn" id="tabSticker" onclick="selectLayer('sticker')" style="flex:1;font-size:11px;min-width:60px">✨ Sticker</button>
           </div>
 
           <!-- BG controls -->
@@ -629,23 +724,23 @@ header{
             <div class="ctrl-grid">
               <div class="ctrl-item">
                 <div class="ctrl-label">Scale <span class="ctrl-val" id="vScale">100%</span></div>
-                <input type="range" class="ctrl-slider" id="sScale" min="5" max="300" value="100" oninput="updateEditor()">
+                <input type="range" class="ctrl-slider" id="sScale" min="5" max="300" value="100" oninput="updateEditor();pushHistory()">
               </div>
               <div class="ctrl-item">
                 <div class="ctrl-label">Xoay <span class="ctrl-val" id="vRotate">0°</span></div>
-                <input type="range" class="ctrl-slider" id="sRotate" min="-180" max="180" value="0" oninput="updateEditor()">
+                <input type="range" class="ctrl-slider" id="sRotate" min="-180" max="180" value="0" oninput="updateEditor();pushHistory()">
               </div>
               <div class="ctrl-item">
                 <div class="ctrl-label">Scale X <span class="ctrl-val" id="vScaleX">100%</span></div>
-                <input type="range" class="ctrl-slider" id="sScaleX" min="1" max="300" value="100" oninput="updateEditor()">
+                <input type="range" class="ctrl-slider" id="sScaleX" min="1" max="300" value="100" oninput="updateEditor();pushHistory()">
               </div>
               <div class="ctrl-item">
                 <div class="ctrl-label">Scale Y <span class="ctrl-val" id="vScaleY">100%</span></div>
-                <input type="range" class="ctrl-slider" id="sScaleY" min="1" max="300" value="100" oninput="updateEditor()">
+                <input type="range" class="ctrl-slider" id="sScaleY" min="1" max="300" value="100" oninput="updateEditor();pushHistory()">
               </div>
               <div class="ctrl-item" style="grid-column:1/-1">
                 <div class="ctrl-label">Opacity <span class="ctrl-val" id="vOpacity">100%</span></div>
-                <input type="range" class="ctrl-slider" id="sOpacity" min="0" max="100" value="100" oninput="updateEditor()">
+                <input type="range" class="ctrl-slider" id="sOpacity" min="0" max="100" value="100" oninput="updateEditor();pushHistory()">
               </div>
             </div>
             <div class="pivot-wrap">
@@ -656,6 +751,113 @@ header{
               <button class="tog-btn" id="btnFlipH" onclick="toggleFlip('H')">↔ Ngang</button>
               <button class="tog-btn" id="btnFlipV" onclick="toggleFlip('V')">↕ Dọc</button>
               <button class="reset-btn" onclick="resetEditor()">↺ Reset</button>
+            </div>
+            <!-- Border / Frame -->
+            <div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:9px;border-top:1px solid var(--border)">
+              <label class="toggle-switch">
+                <input type="checkbox" id="borderToggle" onchange="onBorderToggle()">
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="font-size:12px;color:var(--text2)">🖼 Viền / Frame</span>
+            </div>
+            <div class="border-panel" id="borderPanel">
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Kiểu viền</div>
+              <div class="bs-row">
+                <button class="bs-btn active" data-bs="solid"    onclick="setBorderStyle('solid',this)">Solid</button>
+                <button class="bs-btn"         data-bs="glow"     onclick="setBorderStyle('glow',this)">Glow</button>
+                <button class="bs-btn"         data-bs="gradient" onclick="setBorderStyle('gradient',this)">Gradient</button>
+                <button class="bs-btn"         data-bs="double"   onclick="setBorderStyle('double',this)">Double</button>
+              </div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Màu viền</div>
+              <div class="bc-row">
+                <div class="bc-dot active" style="background:#38bdf8" onclick="setBorderColor('#38bdf8',this)"></div>
+                <div class="bc-dot" style="background:#f5c518" onclick="setBorderColor('#f5c518',this)"></div>
+                <div class="bc-dot" style="background:#ffffff" onclick="setBorderColor('#ffffff',this)"></div>
+                <div class="bc-dot" style="background:#f87171" onclick="setBorderColor('#f87171',this)"></div>
+                <div class="bc-dot" style="background:#4ade80" onclick="setBorderColor('#4ade80',this)"></div>
+                <div class="bc-dot" style="background:#a855f7" onclick="setBorderColor('#a855f7',this)"></div>
+                <div class="bc-dot" style="background:#000000" onclick="setBorderColor('#000000',this)"></div>
+                <input type="color" class="bc-custom" id="borderCustomColor" value="#38bdf8" oninput="setBorderColor(this.value,null)" title="Tùy chọn">
+              </div>
+              <div class="ctrl-item" style="margin-top:6px">
+                <div class="ctrl-label">Độ dày <span class="ctrl-val" id="vBorderW">8px</span></div>
+                <input type="range" class="ctrl-slider" id="sBorderW" min="1" max="50" value="8" oninput="updateBorderWidth()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter controls -->
+          <div id="filterControls" style="display:none">
+            <div class="filter-grid">
+              <div class="ctrl-item">
+                <div class="ctrl-label">Sáng <span class="ctrl-val" id="vBright">100%</span></div>
+                <input type="range" class="ctrl-slider" id="sBright" min="0" max="300" value="100" oninput="updateFilter()">
+              </div>
+              <div class="ctrl-item">
+                <div class="ctrl-label">Tương phản <span class="ctrl-val" id="vContrast">100%</span></div>
+                <input type="range" class="ctrl-slider" id="sContrast" min="0" max="300" value="100" oninput="updateFilter()">
+              </div>
+              <div class="ctrl-item">
+                <div class="ctrl-label">Bão hoà <span class="ctrl-val" id="vSaturate">100%</span></div>
+                <input type="range" class="ctrl-slider" id="sSaturate" min="0" max="300" value="100" oninput="updateFilter()">
+              </div>
+              <div class="ctrl-item">
+                <div class="ctrl-label">Xoay màu <span class="ctrl-val" id="vHue">0°</span></div>
+                <input type="range" class="ctrl-slider" id="sHue" min="-180" max="180" value="0" oninput="updateFilter()">
+              </div>
+              <div class="ctrl-item">
+                <div class="ctrl-label">Sepia <span class="ctrl-val" id="vSepia">0%</span></div>
+                <input type="range" class="ctrl-slider" id="sSepia" min="0" max="100" value="0" oninput="updateFilter()">
+              </div>
+              <div class="ctrl-item">
+                <div class="ctrl-label">Mờ (Blur) <span class="ctrl-val" id="vBlur">0px</span></div>
+                <input type="range" class="ctrl-slider" id="sBlur" min="0" max="20" value="0" oninput="updateFilter()">
+              </div>
+            </div>
+            <button class="filter-reset" onclick="resetFilter()">↺ Reset filter</button>
+          </div>
+
+          <!-- Text layer controls -->
+          <div id="textControls" style="display:none">
+            <div class="text-add-row">
+              <input class="inp" id="textInput" type="text" placeholder="Nhập chữ..." style="flex:1" onkeydown="if(event.key==='Enter')addTextLayer()">
+              <input type="color" class="text-color-pick" id="textColor" value="#ffffff" title="Màu chữ">
+              <button class="inp-btn primary" onclick="addTextLayer()">+ Thêm</button>
+            </div>
+            <div class="font-row" style="margin-bottom:8px">
+              <button class="font-btn active" data-ff="sans-serif" onclick="setNewTextFont('sans-serif',this)">Sans</button>
+              <button class="font-btn" data-ff="serif" onclick="setNewTextFont('serif',this)">Serif</button>
+              <button class="font-btn" data-ff="monospace" onclick="setNewTextFont('monospace',this)">Mono</button>
+              <button class="font-btn" data-ff="cursive" onclick="setNewTextFont('cursive',this)">Script</button>
+            </div>
+            <div class="text-list" id="textList"><div style="font-size:11px;color:var(--text3);padding:6px 0">Chưa có text — nhập và bấm Thêm</div></div>
+            <!-- Selected text controls -->
+            <div class="text-sel-ctrl" id="selectedTextCtrl">
+              <div style="font-size:11px;color:var(--accent);font-weight:600;margin-bottom:7px">⚙ Chỉnh text đang chọn</div>
+              <div class="inp-row" style="margin-bottom:7px">
+                <input class="inp" id="editTextInput" type="text" placeholder="Nội dung..." oninput="updateSelectedText()">
+              </div>
+              <div class="ctrl-grid">
+                <div class="ctrl-item">
+                  <div class="ctrl-label">Cỡ chữ <span class="ctrl-val" id="tvSize">32px</span></div>
+                  <input type="range" class="ctrl-slider" id="tsSize" min="6" max="200" value="32" oninput="updateSelectedText()">
+                </div>
+                <div class="ctrl-item">
+                  <div class="ctrl-label">Xoay <span class="ctrl-val" id="tvRotate">0°</span></div>
+                  <input type="range" class="ctrl-slider" id="tsRotate" min="-180" max="180" value="0" oninput="updateSelectedText()">
+                </div>
+                <div class="ctrl-item" style="grid-column:1/-1">
+                  <div class="ctrl-label">Opacity <span class="ctrl-val" id="tvOpacity">100%</span></div>
+                  <input type="range" class="ctrl-slider" id="tsOpacity" min="0" max="100" value="100" oninput="updateSelectedText()">
+                </div>
+              </div>
+              <div class="toggle-row" style="margin-top:6px;align-items:center">
+                <input type="color" id="editTextColor" value="#ffffff" title="Màu" style="width:26px;height:26px;border-radius:5px;border:1px solid var(--border2);cursor:pointer;padding:1px;background:transparent;flex-shrink:0" oninput="updateSelectedText()">
+                <button class="tog-btn" id="tbtnBold" onclick="toggleTextStyle('bold')"><b>B</b></button>
+                <button class="tog-btn" id="tbtnItalic" onclick="toggleTextStyle('italic')" style="font-style:italic">I</button>
+                <button class="tog-btn" id="tbtnShadow" onclick="toggleTextStyle('shadow')">Bóng</button>
+                <button class="reset-btn" onclick="deleteSelectedText()" style="border-color:var(--red);color:var(--red)">🗑 Xoá</button>
+              </div>
             </div>
           </div>
 
@@ -696,9 +898,27 @@ header{
             <div style="margin-top:8px">
               <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:5px">Thêm ảnh sticker từ file:</label>
               <div class="upload-zone" style="padding:10px">
-                <input type="file" accept="image/*" onchange="addStickerFromFile(this.files[0])">
+                <input type="file" id="stickerFileInput" accept="image/*" onchange="addStickerFromFile(this.files[0])">
                 <div style="font-size:12px;color:var(--text3)">📎 Click hoặc kéo thả ảnh</div>
               </div>
+              <!-- Remove background toggle -->
+              <div class="modal-toggle-row" style="margin-top:6px;padding:6px 8px">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="stickerRemoveBgToggle">
+                  <span class="toggle-slider"></span>
+                </label>
+                <span style="font-size:11px;color:var(--text2)">✂ Tách nền trước khi thêm</span>
+              </div>
+              <div id="stickerRemoveBgStatus" style="display:none;font-size:11px;color:var(--text3);padding:4px 8px"></div>
+            </div>
+          </div>
+
+          <!-- Preset bố cục -->
+          <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:5px">📌 Preset bố cục</div>
+            <div class="preset-bar">
+              <button class="preset-save-btn" onclick="savePreset()">💾 Lưu preset</button>
+              <div class="preset-chips" id="presetChips"></div>
             </div>
           </div>
         </div>
@@ -776,6 +996,26 @@ header{
   </div>
 </footer>
 
+<!-- ── Before/After modal ── -->
+<div class="modal-overlay" id="baModal" onclick="if(event.target===this)closeBaModal()">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-title">🔍 Xem trước làm nét</div>
+    <div class="modal-desc" style="max-height:none;margin-bottom:10px">Kéo thanh giữa để so sánh ảnh gốc và ảnh đã làm nét</div>
+    <div class="ba-loading" id="baLoading">⏳ Đang xử lý làm nét (~30-60s)...</div>
+    <div class="ba-wrap" id="baWrap">
+      <img class="ba-before" id="baImgBefore" src="" alt="Gốc">
+      <img class="ba-after"  id="baImgAfter"  src="" alt="Làm nét">
+      <div class="ba-divider" id="baDivider"></div>
+      <div class="ba-handle" id="baHandle">◀ ▶</div>
+    </div>
+    <div class="ba-labels"><span>Gốc</span><span>Đã làm nét ✨</span></div>
+    <div class="modal-btns" style="margin-top:14px">
+      <button class="modal-btn accent" id="baUseBtn" onclick="applyUpscaledImg()" style="display:none">✅ Dùng ảnh làm nét này</button>
+      <button class="modal-btn cancel" onclick="closeBaModal()">Đóng</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── Confirm Run modal ── -->
 <div class="modal-overlay" id="confirmModal" onclick="if(event.target===this)closeConfirmModal()">
   <div class="modal-box">
@@ -789,11 +1029,11 @@ header{
         <input type="checkbox" id="enhance4kToggle">
         <span class="toggle-slider"></span>
       </label>
-      <span class="toggle-label">🚀 Nâng lên 4K với Pollinations AI</span>
+      <span class="toggle-label">🚀 Nâng lên 4K (Làm nét)</span>
     </div>
     <div id="enhance4kNote" style="display:none;font-size:11px;color:var(--text3);margin-top:6px;padding:8px 10px;background:var(--bg2);border-radius:7px;border:1px solid var(--border);line-height:1.6">
-      ⏱ Ảnh sẽ được AI upscale trước khi upload — mất thêm ~30–90 giây<br>
-      ⚠ Nếu Pollinations quá tải sẽ báo lỗi rõ và tự dùng ảnh gốc
+      ⏱ Ảnh sẽ được AI upscale trước khi upload — mất thêm ~30–60 giây<br>
+      ⚠ Nếu làm nét thất bại sẽ báo lỗi rõ và tự dùng ảnh gốc
     </div>
     <div class="modal-processing" id="confirmProcessing">⏳ Đang xử lý...</div>
     <div class="modal-btns" style="margin-top:14px">
@@ -934,10 +1174,39 @@ function handleHarFile(file){
   r.onload=e=>{
     try{
       state.harData=parseHar(JSON.parse(e.target.result));
-      logOk(`HAR OK — User: ${state.harData.userId||'?'} | ${state.harData.isFlowborn?'Flowborn':'Player'}`);
+      const type=state.harData.isFlowborn?'Flowborn':'Player';
+      logOk(`HAR OK — User: ${state.harData.userId||'?'} | ${type}`);
+      // Auto-detect: switch poster type to match HAR
+      const targetType=state.harData.isFlowborn?'flowborn':'player';
+      if(state.posterType!==targetType){
+        const btn=document.querySelector(`[data-poster="${targetType}"]`);
+        if(btn)setPosterType(targetType,btn);
+        logInf(`🔍 Auto-detect: chuyển sang ${type}`);
+      }
+      _showDetectBadge(`🔍 Auto-detect từ HAR: ${type} — User ${state.harData.userId||'?'}`);
     }catch(err){logErr('Lỗi đọc HAR: '+err.message);state.harData=null}
   };
+  r.onerror=()=>logErr('Không đọc được file HAR: '+(r.error?.message||'lỗi quyền truy cập file'));
   r.readAsText(file);
+}
+function autoDetectLink(val){
+  if(!val||!val.includes('kgvn-camp.mobagarena.com'))return;
+  try{
+    const u=new URL(val);
+    const isFlowborn=u.pathname.includes('flowborn');
+    const targetType=isFlowborn?'flowborn':'player';
+    if(state.posterType!==targetType){
+      const btn=document.querySelector(`[data-poster="${targetType}"]`);
+      if(btn)setPosterType(targetType,btn);
+    }
+    const hasToken=val.includes('access_token=');
+    _showDetectBadge(`🔍 Auto-detect: ${isFlowborn?'Flowborn':'Player'} Link${hasToken?' ✓ token':' ⚠ thiếu token'}`);
+  }catch(_){}
+}
+function _showDetectBadge(msg){
+  const b=document.getElementById('detectBadge');
+  b.textContent=msg;b.classList.add('visible');
+  clearTimeout(b._tid);b._tid=setTimeout(()=>b.classList.remove('visible'),6000);
 }
 function clearHar(){state.harData=null;document.getElementById('harChip').style.display='none';document.getElementById('harFileInput').value=''}
 
@@ -950,10 +1219,16 @@ function handleImgDrop(ev){
 }
 function handleImgFile(file){
   if(!file)return;
-  state.imgOrigBlob=state.imgBlob=file;
-  const url=URL.createObjectURL(file);
-  showImgPreview(url,file.name,file.size);
-  loadEditorImage(url);
+  const r=new FileReader();
+  r.onload=e=>{
+    const blob=new Blob([e.target.result],{type:file.type||'image/jpeg'});
+    state.imgOrigBlob=state.imgBlob=blob;
+    const url=URL.createObjectURL(blob);
+    showImgPreview(url,file.name,file.size);
+    loadEditorImage(url);
+  };
+  r.onerror=()=>logErr('Không đọc được file ảnh: '+(r.error?.message||'lỗi quyền truy cập file'));
+  r.readAsArrayBuffer(file);
 }
 async function loadImgFromUrl(){
   const url=document.getElementById('imgUrlInput').value.trim();
@@ -978,6 +1253,7 @@ function showImgPreview(url,name,size){
   document.getElementById('imgPreviewEl').src=url;
   document.getElementById('imgPreviewWrap').classList.add('visible');
   document.getElementById('imgInfo').textContent=`📎 ${name}  (${(size/1024).toFixed(1)} KB)`;
+  document.getElementById('mainImgActions').classList.add('visible');
 }
 
 /* ════════════════════════════════════════════════
@@ -1073,7 +1349,7 @@ function syncSliders(){
 function toggleFlip(axis){
   if(axis==='H'){edState.flipH=!edState.flipH;document.getElementById('btnFlipH').classList.toggle('active',edState.flipH)}
   else{edState.flipV=!edState.flipV;document.getElementById('btnFlipV').classList.toggle('active',edState.flipV)}
-  drawCanvas();
+  drawCanvas();pushHistory();
 }
 function resetEditor(){
   Object.assign(edState,{posX:0,posY:0,scaleX:1,scaleY:1,rotate:0,flipH:false,flipV:false,opacity:1,pivotX:.5,pivotY:.5});
@@ -1091,9 +1367,12 @@ function resetEditor(){
    LAYER TABS
 ════════════════════════════════════════════════ */
 function selectLayer(layer){
-  document.getElementById('tabBg').classList.toggle('active',layer==='bg');
-  document.getElementById('tabSticker').classList.toggle('active',layer==='sticker');
+  ['bg','filter','text','sticker'].forEach(l=>{
+    document.getElementById('tab'+l.charAt(0).toUpperCase()+l.slice(1)).classList.toggle('active',l===layer);
+  });
   document.getElementById('bgControls').style.display=layer==='bg'?'block':'none';
+  document.getElementById('filterControls').style.display=layer==='filter'?'block':'none';
+  document.getElementById('textControls').style.display=layer==='text'?'block':'none';
   document.getElementById('stickerControls').style.display=layer==='sticker'?'block':'none';
 }
 
@@ -1101,23 +1380,59 @@ function selectLayer(layer){
    STICKER SYSTEM
 ════════════════════════════════════════════════ */
 let _stickerCounter=0;
+const _stickerImgMap={};
 function addSticker(imgEl,label){
   const cv=document.getElementById('posterCanvas');
   const sc=Math.min(cv.width/imgEl.naturalWidth,cv.height/imgEl.naturalHeight)*0.4;
-  const s={id:_stickerCounter++,img:imgEl,x:cv.width/2,y:cv.height/2,scale:sc,rotate:0,flipH:false,flipV:false,opacity:1,label:label||'Sticker'};
+  const id=_stickerCounter++;
+  _stickerImgMap[id]=imgEl;
+  const s={id,img:imgEl,x:cv.width/2,y:cv.height/2,scale:sc,rotate:0,flipH:false,flipV:false,opacity:1,label:label||'Sticker'};
   stickers.push(s);
   selectedSticker=stickers.length-1;
-  renderStickerList();drawCanvas();
+  renderStickerList();drawCanvas();pushHistory();
   selectLayer('sticker');
   syncStickerSliders();
   logOk(`Thêm sticker: ${s.label}`);
 }
-function addStickerFromFile(file){
+async function addStickerFromFile(file){
   if(!file)return;
-  const url=URL.createObjectURL(file);
-  const img=new Image();
-  img.onload=()=>addSticker(img,file.name);
-  img.src=url;
+  const doRmBg=document.getElementById('stickerRemoveBgToggle')?.checked;
+  const status=document.getElementById('stickerRemoveBgStatus');
+  if(doRmBg){
+    status.style.display='block';
+    status.textContent='⏳ Đang tách nền...';
+    try{
+      const fd=new FormData();
+      fd.append('image_file',file,'sticker.png');
+      const resp=await fetch('/api/removebg',{method:'POST',body:fd});
+      if(!resp.ok){const t=await resp.text();throw new Error('Tách nền lỗi ('+resp.status+'): '+t.slice(0,80));}
+      const ct=resp.headers.get('Content-Type')||'';
+      let blob;
+      if(ct.includes('application/json')){
+        const j=await resp.json();
+        const b64=j.image||j.result||j.data||j.foreground_image;
+        if(!b64)throw new Error('removebg: không có ảnh trong phản hồi');
+        const bin=atob(b64);const arr=new Uint8Array(bin.length);
+        for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+        blob=new Blob([arr],{type:'image/png'});
+      }else{
+        blob=await resp.blob();
+      }
+      const url=URL.createObjectURL(blob);
+      const img=new Image();
+      img.onload=()=>{addSticker(img,file.name.replace(/\.[^.]+$/,'')+'-nobg.png');status.textContent='✅ Tách nền thành công';setTimeout(()=>{status.style.display='none'},3000);}
+      img.onerror=()=>{status.textContent='❌ Load ảnh thất bại';};
+      img.src=url;
+    }catch(e){
+      status.textContent='❌ '+e.message;
+    }
+  }else{
+    if(status)status.style.display='none';
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>addSticker(img,file.name);
+    img.src=url;
+  }
 }
 function renderStickerList(){
   const list=document.getElementById('stickerList');
@@ -1178,23 +1493,24 @@ function drawCanvas(){
   const cv=document.getElementById('posterCanvas');
   const ctx=cv.getContext('2d');
   ctx.clearRect(0,0,cv.width,cv.height);
-  // BG layer
+  // Border behind (non-glow styles)
+  if(borderState.on&&borderState.style!=='glow')_drawBorder(ctx,cv.width,cv.height,1);
+  // BG layer with filter
   if(edState.img){
     const cx=cv.width/2+edState.posX,cy=cv.height/2+edState.posY;
-    ctx.save();ctx.globalAlpha=edState.opacity;
+    ctx.save();ctx.globalAlpha=edState.opacity;ctx.filter=buildFilter();
     ctx.translate(cx,cy);ctx.rotate(edState.rotate*Math.PI/180);
     ctx.scale(edState.scale*edState.scaleX*(edState.flipH?-1:1),edState.scale*edState.scaleY*(edState.flipV?-1:1));
     ctx.drawImage(edState.img,-edState.img.naturalWidth*edState.pivotX,-edState.img.naturalHeight*edState.pivotY,edState.img.naturalWidth,edState.img.naturalHeight);
-    ctx.restore();
+    ctx.restore();ctx.filter='none';
   }
   // Sticker layers
   stickers.forEach((s,i)=>{
-    ctx.save();ctx.globalAlpha=s.opacity;
+    ctx.save();ctx.globalAlpha=s.opacity;ctx.filter='none';
     ctx.translate(s.x,s.y);ctx.rotate(s.rotate*Math.PI/180);
     ctx.scale(s.scale*(s.flipH?-1:1),s.scale*(s.flipV?-1:1));
     ctx.drawImage(s.img,-s.img.naturalWidth/2,-s.img.naturalHeight/2,s.img.naturalWidth,s.img.naturalHeight);
     ctx.restore();
-    // Selection handles
     if(i===selectedSticker){
       const hw=s.img.naturalWidth*s.scale/2,hh=s.img.naturalHeight*s.scale/2;
       ctx.save();ctx.translate(s.x,s.y);ctx.rotate(s.rotate*Math.PI/180);
@@ -1202,6 +1518,24 @@ function drawCanvas(){
       ctx.strokeRect(-hw,-hh,hw*2,hh*2);ctx.restore();
     }
   });
+  // Text layers
+  texts.forEach((t,i)=>{
+    ctx.save();ctx.globalAlpha=t.opacity;ctx.filter='none';
+    ctx.translate(t.x,t.y);ctx.rotate(t.rotate*Math.PI/180);
+    ctx.font=`${t.italic?'italic ':' '}${t.bold?'bold ':' '}${t.size}px ${t.fontFamily}`;
+    ctx.fillStyle=t.color;ctx.textAlign='center';ctx.textBaseline='middle';
+    if(t.shadow){ctx.shadowColor='rgba(0,0,0,.8)';ctx.shadowBlur=4;ctx.shadowOffsetX=2;ctx.shadowOffsetY=2}
+    ctx.fillText(t.text,0,0);
+    if(i===selectedText){
+      ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
+      const tw=ctx.measureText(t.text).width,th=t.size;
+      ctx.strokeStyle='rgba(56,189,248,.8)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+      ctx.strokeRect(-tw/2-4,-th/2-4,tw+8,th+8);
+    }
+    ctx.restore();
+  });
+  // Glow border on top
+  if(borderState.on&&borderState.style==='glow')_drawBorder(ctx,cv.width,cv.height,1);
 }
 
 /* ════════════════════════════════════════════════
@@ -1230,32 +1564,50 @@ function drawCanvas(){
     }return -1;
   }
 
+  let txtDragging=false,txtDragIdx=-1,tdsx=0,tdsy=0,tdox=0,tdoy=0;
+
   function pdown(mx,my){
     const idx=hitSticker(mx,my);
     if(idx>=0){
-      dragging=true;dragIdx=idx;selectedSticker=idx;
+      dragging=true;dragIdx=idx;selectedSticker=idx;txtDragging=false;txtDragIdx=-1;selectedText=-1;
       dsx=mx;dsy=my;dox=stickers[idx].x;doy=stickers[idx].y;
-      renderStickerList();syncStickerSliders();
+      renderStickerList();syncStickerSliders();renderTextList();
       document.getElementById('selectedCtrl').classList.add('visible');
+      document.getElementById('selectedTextCtrl').classList.remove('visible');
       cv.style.cursor='grabbing';
     } else {
-      selectedSticker=-1;
-      renderStickerList();
-      document.getElementById('selectedCtrl').classList.remove('visible');
+      const tidx=hitText(mx,my);
+      if(tidx>=0){
+        txtDragging=true;txtDragIdx=tidx;selectedText=tidx;dragging=false;dragIdx=-1;selectedSticker=-1;
+        tdsx=mx;tdsy=my;tdox=texts[tidx].x;tdoy=texts[tidx].y;
+        renderTextList();syncSelectedTextUI();renderStickerList();
+        document.getElementById('selectedCtrl').classList.remove('visible');
+        cv.style.cursor='grabbing';
+      } else {
+        selectedSticker=-1;selectedText=-1;txtDragging=false;txtDragIdx=-1;
+        renderStickerList();renderTextList();
+        document.getElementById('selectedCtrl').classList.remove('visible');
+        document.getElementById('selectedTextCtrl').classList.remove('visible');
+      }
     }
     drawCanvas();
   }
 
   function pmove(mx,my){
-    if(dragging){
+    if(dragging&&dragIdx>=0){
       stickers[dragIdx].x=dox+(mx-dsx);
       stickers[dragIdx].y=doy+(my-dsy);
+      drawCanvas();
+    } else if(txtDragging&&txtDragIdx>=0&&txtDragIdx<texts.length){
+      texts[txtDragIdx].x=tdox+(mx-tdsx);
+      texts[txtDragIdx].y=tdoy+(my-tdsy);
       drawCanvas();
     }
   }
 
   function pup(){
-    dragging=false;
+    if(dragging||txtDragging)pushHistory();
+    dragging=false;txtDragging=false;
     cv.style.cursor='';
   }
 
@@ -1313,20 +1665,34 @@ async function exportEdited(outW,outH){
   const ctx=exp.getContext('2d');
   const cv=document.getElementById('posterCanvas');
   const sr=outW/cv.width;
-  ctx.save();ctx.globalAlpha=edState.opacity;
+  // Border behind
+  if(borderState.on&&borderState.style!=='glow')_drawBorder(ctx,outW,outH,sr);
+  // BG
+  ctx.save();ctx.globalAlpha=edState.opacity;ctx.filter=buildFilter();
   const cx=outW/2+edState.posX*sr,cy=outH/2+edState.posY*sr;
   ctx.translate(cx,cy);ctx.rotate(edState.rotate*Math.PI/180);
   ctx.scale(edState.scale*edState.scaleX*(edState.flipH?-1:1)*sr,edState.scale*edState.scaleY*(edState.flipV?-1:1)*sr);
   ctx.drawImage(edState.img,-edState.img.naturalWidth*edState.pivotX,-edState.img.naturalHeight*edState.pivotY,edState.img.naturalWidth,edState.img.naturalHeight);
-  ctx.restore();
-  // stickers
+  ctx.restore();ctx.filter='none';
+  // Stickers
   stickers.forEach(s=>{
-    ctx.save();ctx.globalAlpha=s.opacity;
+    ctx.save();ctx.globalAlpha=s.opacity;ctx.filter='none';
     ctx.translate(s.x*sr,s.y*sr);ctx.rotate(s.rotate*Math.PI/180);
     ctx.scale(s.scale*sr*(s.flipH?-1:1),s.scale*sr*(s.flipV?-1:1));
     ctx.drawImage(s.img,-s.img.naturalWidth/2,-s.img.naturalHeight/2,s.img.naturalWidth,s.img.naturalHeight);
     ctx.restore();
   });
+  // Texts
+  texts.forEach(t=>{
+    ctx.save();ctx.globalAlpha=t.opacity;ctx.filter='none';
+    ctx.translate(t.x*sr,t.y*sr);ctx.rotate(t.rotate*Math.PI/180);
+    ctx.font=`${t.italic?'italic ':' '}${t.bold?'bold ':' '}${t.size*sr}px ${t.fontFamily}`;
+    ctx.fillStyle=t.color;ctx.textAlign='center';ctx.textBaseline='middle';
+    if(t.shadow){ctx.shadowColor='rgba(0,0,0,.8)';ctx.shadowBlur=4*sr;ctx.shadowOffsetX=2*sr;ctx.shadowOffsetY=2*sr}
+    ctx.fillText(t.text,0,0);ctx.restore();
+  });
+  // Glow border on top
+  if(borderState.on&&borderState.style==='glow')_drawBorder(ctx,outW,outH,sr);
   return new Promise(res=>exp.toBlob(res,'image/png'));
 }
 function exportCanvas(){
@@ -1523,7 +1889,7 @@ function parseLink(link){
   if(!accessToken)throw new Error('Không tìm thấy access_token!');
   const partition=p.partition||'',aovAreaid=p.aov_areaid||'1',aovRegion=p.aov_region||'';
   const gameid=p.gameid||'1137',channelid=p.channelid||'10',lang=p.lang||'VN';
-  const itopencodeparam=p.itopencodeparam||'',osId=p.os||'2',version=p.version||'5.36.000.9136';
+  const itopencodeparam=p.itopencodeparam||'',osId=p.os||'2',version=(p.version&&p.version!=='null')?p.version:'5.36.000.9136';
   const seq=p.seq||'',heroJob=parseInt(p.heroJob||'5');
   const isFlowborn=url.pathname.includes('flowborn-poster');
   let ua;
@@ -1557,8 +1923,8 @@ async function cosSign(sId,sKey,method,uri,sHdrs,t0,t1){
 ════════════════════════════════════════════════ */
 function buildApiHeaders(info,extra){return{...info.headers,'Content-Type':'application/json','Accept':'*/*','Sec-Fetch-Mode':'cors','Sec-Fetch-Site':'same-site','Sec-Fetch-Dest':'empty',...extra}}
 async function apiPost(info,ep,body={}){
-  const url=`${info.apiBase}${ep}?access_token=${info.accessToken}`;
-  const resp=await fetch(url,{method:'POST',headers:buildApiHeaders(info),body:JSON.stringify(body),credentials:'omit'});
+  const targetUrl=`${info.apiBase}${ep}?access_token=${info.accessToken}`;
+  const resp=await fetch('/api/aov',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:targetUrl,headers:buildApiHeaders(info),body})});
   if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
   const data=await resp.json();
   if(data.code!==0)throw new Error(`API code ${data.code}: ${data.msg||''}`);
@@ -1583,7 +1949,8 @@ async function uploadCos(cred,buf,ct,ua){
   const host=`${bucket}-${appId}.cos.${region}.myqcloud.com`;
   const sHdrs={'content-length':String(buf.byteLength),'host':host,'x-cos-forbid-overwrite':'true'};
   const auth=await cosSign(sId,sKey,'PUT',path,sHdrs,t0,t1);
-  const r=await fetch(`https://${host}${path}`,{method:'PUT',headers:{Host:host,Authorization:auth,'x-cos-security-token':token,'x-cos-forbid-overwrite':'true','Content-Type':ct,'Content-Length':String(buf.byteLength),'Origin':'https://kgvn-camp.mobagarena.com','Referer':'https://kgvn-camp.mobagarena.com/'},body:buf,credentials:'omit'});
+  const targetUrl=`https://${host}${path}`;
+  const r=await fetch('/api/cos-upload',{method:'PUT',headers:{'X-Cos-Target':targetUrl,'Authorization':auth,'x-cos-security-token':token,'x-cos-forbid-overwrite':'true','Content-Type':ct,'Content-Length':String(buf.byteLength),'Host':host,'Origin':'https://kgvn-camp.mobagarena.com','Referer':'https://kgvn-camp.mobagarena.com/'},body:buf});
   if(![200,204].includes(r.status))throw new Error(`COS ${r.status}`);
 }
 
@@ -1637,43 +2004,47 @@ async function doConfirmedRun(){
 }
 
 /* ════════════════════════════════════════════════
-   POLLINATIONS 4K UPSCALE
+   LÀM NÉT 4K UPSCALE
 ════════════════════════════════════════════════ */
 async function upscaleTo4K(blob){
-  logGold('🚀 Pollinations AI — đang upscale 4K...');
+  logGold('🚀 Làm nét — đang upscale 4K (tối đa 90s)...');
   const formData=new FormData();
   formData.append('image',blob,'poster.png');
-  formData.append('scale','4');
+  const ctrl=new AbortController();
+  const tid=setTimeout(()=>ctrl.abort(),95000);
   let resp;
   try{
-    resp=await fetch('/api/pollinations/upscale',{method:'POST',body:formData});
+    resp=await fetch('/api/satoru/upscale',{method:'POST',body:formData,signal:ctrl.signal});
   }catch(netErr){
-    throw new Error('Không kết nối được Pollinations: '+netErr.message);
+    clearTimeout(tid);
+    if(netErr.name==='AbortError')throw new Error('Làm nét không phản hồi sau 90s');
+    throw new Error('Không kết nối được API làm nét: '+netErr.message);
   }
+  clearTimeout(tid);
   if(!resp.ok){
     let detail=`HTTP ${resp.status}`;
     try{
       const txt=await resp.text();
-      const trimmed=txt.slice(0,200).trim();
+      const trimmed=txt.slice(0,300).trim();
       if(trimmed)detail+=` — ${trimmed}`;
     }catch(_){}
-    throw new Error('Pollinations upscale thất bại: '+detail);
+    throw new Error('Làm nét thất bại: '+detail);
   }
   const ct=resp.headers.get('Content-Type')||'';
   let resultBlob;
   if(ct.includes('application/json')){
-    let json;
-    try{json=await resp.json()}catch(e){throw new Error('Pollinations: phản hồi JSON không hợp lệ')}
-    if(json.error||json.message)throw new Error('Pollinations: '+(json.error||json.message));
-    const b64=json.image||json.result||json.data;
-    if(!b64)throw new Error('Pollinations: không có dữ liệu ảnh trong phản hồi');
+    let j;
+    try{j=await resp.json()}catch(e){throw new Error('Làm nét: phản hồi JSON không hợp lệ')}
+    if(j.error||j.message)throw new Error('Làm nét: '+(j.error||j.message));
+    const b64=j.image||j.result||j.data;
+    if(!b64)throw new Error('Làm nét: không có dữ liệu ảnh trong phản hồi — '+JSON.stringify(j).slice(0,200));
     const bin=atob(b64);const arr=new Uint8Array(bin.length);
     for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
     resultBlob=new Blob([arr],{type:'image/png'});
   }else{
     resultBlob=await resp.blob();
   }
-  if(resultBlob.size<2000)throw new Error('Pollinations trả về ảnh rỗng/quá nhỏ ('+resultBlob.size+' bytes) — API có thể không hỗ trợ định dạng này');
+  if(resultBlob.size<2000)throw new Error('Làm nét trả về ảnh rỗng/quá nhỏ ('+resultBlob.size+' bytes)');
   logOk(`✅ 4K upscale xong: ${(resultBlob.size/1024).toFixed(0)}KB`);
   return resultBlob;
 }
@@ -1756,7 +2127,10 @@ async function runPlayerFlow(info,largeBuf,thumbBuf,imgCt,ua){
   logInf('Upload .png...');await uploadCos(cP,thumbBuf,'image/png',ua);logOk('Upload .png OK');setProgress(78,'');
   const cdn=cP.cdnHost||'https://kg-camp-ugc.mobagarena.com';
   const parts=cP.path.split('/');const pfx=parts.slice(0,parts.length-3).join('/')||(info.posterPathPrefix||'');
-  logInf('Lưu poster...');await apiSavePoster(info,pid,cdn,pfx);logOk('savePoster OK');setProgress(100,'✅');
+  const picUrl=`${cdn}${pfx}/`;
+  logDim(`COS path: ${cP.path}`);logDim(`picUrl → ${picUrl}`);
+  logInf('Lưu poster...');const saveResp=await apiSavePoster(info,pid,cdn,pfx);
+  logOk(`savePoster OK — posterUrl: ${saveResp?.posterUrl||saveResp?.picUrl||'(none)'}`);setProgress(100,'✅');
   logGold(`🎉 Thành công! (ID=${pid})`);state.stats.ok++;updateStats();
 }
 async function runFlowbornFlow(info,largeBuf,thumbBuf,imgCt,ua){
@@ -1775,9 +2149,412 @@ async function runFlowbornFlow(info,largeBuf,thumbBuf,imgCt,ua){
 }
 
 /* ════════════════════════════════════════════════
+   FILTER SYSTEM
+════════════════════════════════════════════════ */
+const filterState={bright:100,contrast:100,saturate:100,hue:0,sepia:0,blur:0};
+function buildFilter(){
+  const f=filterState;
+  if(f.bright===100&&f.contrast===100&&f.saturate===100&&f.hue===0&&f.sepia===0&&f.blur===0)return'none';
+  return`brightness(${f.bright}%) contrast(${f.contrast}%) saturate(${f.saturate}%) hue-rotate(${f.hue}deg) sepia(${f.sepia}%) blur(${f.blur}px)`;
+}
+function updateFilter(){
+  filterState.bright  =+document.getElementById('sBright').value;
+  filterState.contrast=+document.getElementById('sContrast').value;
+  filterState.saturate=+document.getElementById('sSaturate').value;
+  filterState.hue     =+document.getElementById('sHue').value;
+  filterState.sepia   =+document.getElementById('sSepia').value;
+  filterState.blur    =+document.getElementById('sBlur').value;
+  document.getElementById('vBright').textContent  =filterState.bright+'%';
+  document.getElementById('vContrast').textContent=filterState.contrast+'%';
+  document.getElementById('vSaturate').textContent=filterState.saturate+'%';
+  document.getElementById('vHue').textContent     =filterState.hue+'°';
+  document.getElementById('vSepia').textContent   =filterState.sepia+'%';
+  document.getElementById('vBlur').textContent    =filterState.blur+'px';
+  drawCanvas();pushHistory();
+}
+function resetFilter(){
+  Object.assign(filterState,{bright:100,contrast:100,saturate:100,hue:0,sepia:0,blur:0});
+  _syncFilterSliders();drawCanvas();pushHistory();
+}
+function _syncFilterSliders(){
+  document.getElementById('sBright').value   =filterState.bright;
+  document.getElementById('sContrast').value =filterState.contrast;
+  document.getElementById('sSaturate').value =filterState.saturate;
+  document.getElementById('sHue').value      =filterState.hue;
+  document.getElementById('sSepia').value    =filterState.sepia;
+  document.getElementById('sBlur').value     =filterState.blur;
+  document.getElementById('vBright').textContent  =filterState.bright+'%';
+  document.getElementById('vContrast').textContent=filterState.contrast+'%';
+  document.getElementById('vSaturate').textContent=filterState.saturate+'%';
+  document.getElementById('vHue').textContent     =filterState.hue+'°';
+  document.getElementById('vSepia').textContent   =filterState.sepia+'%';
+  document.getElementById('vBlur').textContent    =filterState.blur+'px';
+}
+
+/* ════════════════════════════════════════════════
+   TEXT LAYER SYSTEM
+════════════════════════════════════════════════ */
+const texts=[];
+let selectedText=-1;
+let _newTextFont='sans-serif';
+let _textCounter=0;
+
+function hitText(mx,my){
+  const cv=document.getElementById('posterCanvas');
+  const tmp=cv.getContext('2d');
+  for(let i=texts.length-1;i>=0;i--){
+    const t=texts[i];
+    const dx=mx-t.x,dy=my-t.y;
+    const cos=Math.cos(-t.rotate*Math.PI/180),sin=Math.sin(-t.rotate*Math.PI/180);
+    const lx=cos*dx-sin*dy,ly=sin*dx+cos*dy;
+    tmp.font=`${t.italic?'italic ':' '}${t.bold?'bold ':' '}${t.size}px ${t.fontFamily}`;
+    const tw=tmp.measureText(t.text).width/2+8,th=t.size/2+8;
+    if(Math.abs(lx)<tw&&Math.abs(ly)<th)return i;
+  }
+  return -1;
+}
+
+function addTextLayer(){
+  const val=document.getElementById('textInput').value.trim();
+  if(!val){logWarn('Nhập nội dung chữ!');return}
+  const cv=document.getElementById('posterCanvas');
+  const color=document.getElementById('textColor').value||'#ffffff';
+  const t={id:_textCounter++,text:val,x:cv.width/2,y:cv.height/2,size:36,rotate:0,opacity:1,color,fontFamily:_newTextFont,bold:false,italic:false,shadow:false};
+  texts.push(t);selectedText=texts.length-1;
+  document.getElementById('textInput').value='';
+  renderTextList();syncSelectedTextUI();drawCanvas();pushHistory();
+  logOk(`Thêm text: "${val}"`);
+}
+
+function setNewTextFont(ff,btn){
+  _newTextFont=ff;
+  document.querySelectorAll('.font-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function renderTextList(){
+  const list=document.getElementById('textList');
+  if(!texts.length){list.innerHTML='<div style="font-size:11px;color:var(--text3);padding:6px 0">Chưa có text — nhập và bấm Thêm</div>';return}
+  list.innerHTML='';
+  texts.forEach((t,i)=>{
+    const item=document.createElement('div');
+    item.className='text-item'+(i===selectedText?' active':'');
+    item.innerHTML=`<div class="text-preview" style="color:${t.color};font-family:${t.fontFamily};font-size:14px;${t.bold?'font-weight:bold;':''}${t.italic?'font-style:italic;':''}">${t.text.slice(0,3)||'A'}</div><div class="text-item-name">${t.text}</div><button class="text-del" onclick="event.stopPropagation();deleteText(${i})">✕</button>`;
+    item.onclick=()=>{selectedText=i;renderTextList();syncSelectedTextUI();document.getElementById('selectedTextCtrl').classList.add('visible');drawCanvas()};
+    list.appendChild(item);
+  });
+  document.getElementById('selectedTextCtrl').classList.toggle('visible',selectedText>=0&&selectedText<texts.length);
+}
+
+function syncSelectedTextUI(){
+  if(selectedText<0||selectedText>=texts.length){document.getElementById('selectedTextCtrl').classList.remove('visible');return}
+  const t=texts[selectedText];
+  document.getElementById('editTextInput').value=t.text;
+  document.getElementById('tsSize').value=t.size;
+  document.getElementById('tsRotate').value=t.rotate;
+  document.getElementById('tsOpacity').value=Math.round(t.opacity*100);
+  document.getElementById('tvSize').textContent=t.size+'px';
+  document.getElementById('tvRotate').textContent=t.rotate+'°';
+  document.getElementById('tvOpacity').textContent=Math.round(t.opacity*100)+'%';
+  document.getElementById('editTextColor').value=t.color;
+  document.getElementById('tbtnBold').classList.toggle('active',t.bold);
+  document.getElementById('tbtnItalic').classList.toggle('active',t.italic);
+  document.getElementById('tbtnShadow').classList.toggle('active',t.shadow);
+  document.getElementById('selectedTextCtrl').classList.add('visible');
+}
+
+function updateSelectedText(){
+  if(selectedText<0||selectedText>=texts.length)return;
+  const t=texts[selectedText];
+  t.text   =document.getElementById('editTextInput').value;
+  t.size   =+document.getElementById('tsSize').value;
+  t.rotate =+document.getElementById('tsRotate').value;
+  t.opacity=document.getElementById('tsOpacity').value/100;
+  t.color  =document.getElementById('editTextColor').value;
+  document.getElementById('tvSize').textContent=t.size+'px';
+  document.getElementById('tvRotate').textContent=t.rotate+'°';
+  document.getElementById('tvOpacity').textContent=Math.round(t.opacity*100)+'%';
+  renderTextList();drawCanvas();
+}
+
+function toggleTextStyle(prop){
+  if(selectedText<0||selectedText>=texts.length)return;
+  texts[selectedText][prop]=!texts[selectedText][prop];
+  document.getElementById('tbtn'+prop.charAt(0).toUpperCase()+prop.slice(1)).classList.toggle('active',texts[selectedText][prop]);
+  renderTextList();drawCanvas();pushHistory();
+}
+
+function deleteText(i){
+  texts.splice(i,1);
+  if(selectedText>=texts.length)selectedText=texts.length-1;
+  renderTextList();drawCanvas();pushHistory();
+}
+function deleteSelectedText(){if(selectedText>=0)deleteText(selectedText)}
+
+/* ════════════════════════════════════════════════
+   BORDER / FRAME SYSTEM
+════════════════════════════════════════════════ */
+const borderState={on:false,style:'solid',color:'#38bdf8',width:8};
+
+function onBorderToggle(){
+  borderState.on=document.getElementById('borderToggle').checked;
+  document.getElementById('borderPanel').classList.toggle('visible',borderState.on);
+  drawCanvas();pushHistory();
+}
+function setBorderStyle(s,btn){
+  borderState.style=s;
+  document.querySelectorAll('.bs-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  drawCanvas();pushHistory();
+}
+function setBorderColor(c,dot){
+  borderState.color=c;
+  document.getElementById('borderCustomColor').value=c;
+  if(dot){document.querySelectorAll('.bc-dot').forEach(b=>b.classList.remove('active'));dot.classList.add('active')}
+  drawCanvas();pushHistory();
+}
+function updateBorderWidth(){
+  borderState.width=+document.getElementById('sBorderW').value;
+  document.getElementById('vBorderW').textContent=borderState.width+'px';
+  drawCanvas();pushHistory();
+}
+function _drawBorder(ctx,w,h,sr){
+  ctx.save();
+  const bw=borderState.width*(sr||1);const c=borderState.color;
+  if(borderState.style==='glow'){
+    ctx.shadowColor=c;ctx.shadowBlur=bw*2.5;
+    ctx.strokeStyle=c;ctx.lineWidth=bw*0.6;
+    ctx.strokeRect(bw,bw,w-bw*2,h-bw*2);
+  }else if(borderState.style==='gradient'){
+    const g=ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,c);g.addColorStop(0.5,_shiftHue(c,90));g.addColorStop(1,_shiftHue(c,180));
+    ctx.strokeStyle=g;ctx.lineWidth=bw;
+    ctx.strokeRect(bw/2,bw/2,w-bw,h-bw);
+  }else if(borderState.style==='double'){
+    ctx.strokeStyle=c;ctx.lineWidth=Math.max(1,bw*0.35);
+    ctx.strokeRect(bw/2,bw/2,w-bw,h-bw);
+    ctx.strokeRect(bw*1.4,bw*1.4,w-bw*2.8,h-bw*2.8);
+  }else{
+    ctx.strokeStyle=c;ctx.lineWidth=bw;
+    ctx.strokeRect(bw/2,bw/2,w-bw,h-bw);
+  }
+  ctx.restore();
+}
+function _shiftHue(hex,deg){
+  let r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b),l=(max+min)/2,d=max-min;
+  let h=0,s=d/(1-Math.abs(2*l-1))||0;
+  if(d){if(max===r)h=((g-b)/d)%6;else if(max===g)h=(b-r)/d+2;else h=(r-g)/d+4;h=h*60;if(h<0)h+=360}
+  h=(h+deg)%360;if(h<0)h+=360;
+  const c2=s*(1-Math.abs(2*l-1)),x=c2*(1-Math.abs(h/60%2-1)),m=l-c2/2;
+  let r2=0,g2=0,b2=0;
+  if(h<60){r2=c2;g2=x}else if(h<120){r2=x;g2=c2}else if(h<180){g2=c2;b2=x}else if(h<240){g2=x;b2=c2}else if(h<300){r2=x;b2=c2}else{r2=c2;b2=x}
+  return`#${Math.round((r2+m)*255).toString(16).padStart(2,'0')}${Math.round((g2+m)*255).toString(16).padStart(2,'0')}${Math.round((b2+m)*255).toString(16).padStart(2,'0')}`;
+}
+function _syncBorderUI(){
+  document.getElementById('borderToggle').checked=borderState.on;
+  document.getElementById('borderPanel').classList.toggle('visible',borderState.on);
+  document.getElementById('sBorderW').value=borderState.width;
+  document.getElementById('vBorderW').textContent=borderState.width+'px';
+  document.getElementById('borderCustomColor').value=borderState.color;
+  document.querySelectorAll('.bs-btn').forEach(b=>b.classList.toggle('active',b.dataset.bs===borderState.style));
+}
+
+/* ════════════════════════════════════════════════
+   UNDO / REDO
+════════════════════════════════════════════════ */
+const _history=[];let _histIdx=-1;const _HIST_MAX=40;
+function _snapshot(){
+  return{
+    ed:{scale:edState.scale,scaleX:edState.scaleX,scaleY:edState.scaleY,posX:edState.posX,posY:edState.posY,rotate:edState.rotate,flipH:edState.flipH,flipV:edState.flipV,opacity:edState.opacity,pivotX:edState.pivotX,pivotY:edState.pivotY},
+    stk:stickers.map(s=>({id:s.id,x:s.x,y:s.y,scale:s.scale,rotate:s.rotate,flipH:s.flipH,flipV:s.flipV,opacity:s.opacity,label:s.label})),
+    txt:JSON.parse(JSON.stringify(texts)),
+    flt:{...filterState},brd:{...borderState},
+  };
+}
+function _restoreSnapshot(snap){
+  Object.assign(edState,snap.ed);
+  stickers.length=0;
+  snap.stk.forEach(d=>{const img=_stickerImgMap[d.id];if(img)stickers.push({...d,img})});
+  texts.length=0;snap.txt.forEach(t=>texts.push({...t}));
+  Object.assign(filterState,snap.flt);Object.assign(borderState,snap.brd);
+  syncSliders();_syncFilterSliders();_syncBorderUI();renderStickerList();renderTextList();drawCanvas();
+}
+function pushHistory(){
+  if(_histIdx<_history.length-1)_history.splice(_histIdx+1);
+  _history.push(_snapshot());
+  if(_history.length>_HIST_MAX)_history.shift();
+  _histIdx=_history.length-1;
+  _syncHistBtns();
+}
+function _syncHistBtns(){
+  document.getElementById('undoBtn').disabled=_histIdx<=0;
+  document.getElementById('redoBtn').disabled=_histIdx>=_history.length-1;
+  document.getElementById('histLabel').textContent=_history.length>1?`${_histIdx+1}/${_history.length}`:'';
+}
+function undo(){if(_histIdx>0){_histIdx--;_restoreSnapshot(_history[_histIdx]);_syncHistBtns()}}
+function redo(){if(_histIdx<_history.length-1){_histIdx++;_restoreSnapshot(_history[_histIdx]);_syncHistBtns()}}
+// Keyboard shortcuts
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key==='z'){e.preventDefault();undo()}
+  if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.shiftKey&&e.key==='z'))){e.preventDefault();redo()}
+});
+
+/* ════════════════════════════════════════════════
+   PRESET SYSTEM
+════════════════════════════════════════════════ */
+const _PRESET_KEY='aov_presets_v1';
+function _loadPresets(){try{return JSON.parse(localStorage.getItem(_PRESET_KEY)||'[]')}catch{return[]}}
+function _savePresetsLS(arr){try{localStorage.setItem(_PRESET_KEY,JSON.stringify(arr))}catch{}}
+function savePreset(){
+  const name=prompt('Tên preset:','Preset '+(new Date().toLocaleTimeString('vi-VN',{hour12:false})));
+  if(!name)return;
+  const arr=_loadPresets();
+  arr.push({name,snap:_snapshot(),ts:Date.now()});
+  _savePresetsLS(arr);renderPresets();logOk(`Đã lưu preset: ${name}`);
+}
+function loadPreset(idx){
+  const arr=_loadPresets();if(idx<0||idx>=arr.length)return;
+  _restoreSnapshot(arr[idx].snap);pushHistory();logOk(`Đã load preset: ${arr[idx].name}`);
+}
+function deletePreset(idx,e){
+  e.stopPropagation();
+  const arr=_loadPresets();arr.splice(idx,1);_savePresetsLS(arr);renderPresets();
+}
+function renderPresets(){
+  const arr=_loadPresets();const cont=document.getElementById('presetChips');
+  if(!arr.length){cont.innerHTML='<span style="font-size:11px;color:var(--text3)">Chưa có preset</span>';return}
+  cont.innerHTML='';
+  arr.forEach((p,i)=>{
+    const chip=document.createElement('div');chip.className='preset-chip';
+    chip.innerHTML=`📐 ${p.name} <span class="pc-del" onclick="deletePreset(${i},event)">✕</span>`;
+    chip.onclick=()=>loadPreset(i);
+    cont.appendChild(chip);
+  });
+}
+
+/* ════════════════════════════════════════════════
+   MAIN IMAGE: XOÁ NỀN + KHÔI PHỤC
+════════════════════════════════════════════════ */
+async function mainImgRemoveBg(){
+  if(!state.imgOrigBlob){logWarn('Chưa có ảnh chính!');return}
+  const status=document.getElementById('miaStatus');
+  status.textContent='⏳ Đang xoá nền...';status.className='mia-status loading';
+  try{
+    const fd=new FormData();fd.append('image_file',state.imgOrigBlob,'image.png');
+    const resp=await fetch('/api/removebg',{method:'POST',body:fd});
+    if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+    const ct=resp.headers.get('Content-Type')||'';let blob;
+    if(ct.includes('application/json')){
+      const j=await resp.json();const b64=j.image||j.result||j.data||j.foreground_image;
+      if(!b64)throw new Error('Không có dữ liệu ảnh');
+      const bin=atob(b64);const arr=new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+      blob=new Blob([arr],{type:'image/png'});
+    }else{blob=await resp.blob()}
+    state.imgBlob=blob;
+    const url=URL.createObjectURL(blob);
+    document.getElementById('imgPreviewEl').src=url;
+    loadEditorImage(url);
+    document.getElementById('btnRestoreImg').style.display='inline-block';
+    status.textContent='✅ Xoá nền thành công';status.className='mia-status on';
+    logOk('Xoá nền ảnh chính thành công ✂');
+    setTimeout(()=>{status.className='mia-status'},3000);
+  }catch(err){
+    status.textContent='❌ Lỗi: '+err.message;status.className='mia-status on';
+    logErr('Xoá nền lỗi: '+err.message);
+  }
+}
+function mainImgRestore(){
+  if(!state.imgOrigBlob)return;
+  state.imgBlob=state.imgOrigBlob;
+  const url=URL.createObjectURL(state.imgOrigBlob);
+  document.getElementById('imgPreviewEl').src=url;
+  loadEditorImage(url);
+  document.getElementById('btnRestoreImg').style.display='none';
+  document.getElementById('miaStatus').className='mia-status';
+  logOk('Đã khôi phục ảnh gốc');
+}
+
+/* ════════════════════════════════════════════════
+   BEFORE / AFTER UPSCALE PREVIEW
+════════════════════════════════════════════════ */
+let _upscaledBlob=null;
+async function showBeforeAfter(){
+  if(!state.imgOrigBlob&&!edState.img){logWarn('Chưa có ảnh chính!');return}
+  _upscaledBlob=null;
+  document.getElementById('baModal').classList.add('open');
+  document.getElementById('baLoading').classList.add('visible');
+  document.getElementById('baWrap').classList.remove('ready');
+  document.getElementById('baUseBtn').style.display='none';
+  try{
+    // Use edited canvas or orig blob
+    const cv=document.getElementById('posterCanvas');
+    const srcBlob=edState.img?await exportEdited(cv.width,cv.height):state.imgOrigBlob;
+    // Before
+    const beforeUrl=URL.createObjectURL(srcBlob);
+    // Call upscale API
+    const fd=new FormData();fd.append('image',srcBlob,'poster.png');
+    const resp=await fetch('/api/satoru/upscale',{method:'POST',body:fd});
+    if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+    const blob=await resp.blob();
+    if(blob.size<2000)throw new Error('Ảnh làm nét quá nhỏ');
+    _upscaledBlob=blob;
+    const afterUrl=URL.createObjectURL(blob);
+    document.getElementById('baImgBefore').src=beforeUrl;
+    document.getElementById('baImgAfter').src=afterUrl;
+    document.getElementById('baImgAfter').onload=()=>{
+      document.getElementById('baLoading').classList.remove('visible');
+      document.getElementById('baWrap').classList.add('ready');
+      document.getElementById('baUseBtn').style.display='';
+      _initBaSlider();
+    };
+  }catch(err){
+    document.getElementById('baLoading').classList.remove('visible');
+    document.getElementById('baLoading').textContent='❌ Lỗi: '+err.message;
+    document.getElementById('baLoading').classList.add('visible');
+    logErr('Làm nét preview lỗi: '+err.message);
+  }
+}
+function _initBaSlider(){
+  const wrap=document.getElementById('baWrap');
+  const after=document.getElementById('baImgAfter');
+  const div=document.getElementById('baDivider');
+  const handle=document.getElementById('baHandle');
+  let pct=50;
+  function set(p){
+    pct=Math.max(0,Math.min(100,p));
+    after.style.clipPath=`inset(0 ${100-pct}% 0 0)`;
+    div.style.left=handle.style.left=pct+'%';
+  }
+  set(50);
+  function onMove(e){
+    const r=wrap.getBoundingClientRect();
+    const x=((e.touches?e.touches[0].clientX:e.clientX)-r.left)/r.width*100;
+    set(x);
+  }
+  wrap.onmousedown=e=>{e.preventDefault();document.onmousemove=onMove;document.onmouseup=()=>{document.onmousemove=null}};
+  wrap.ontouchstart=e=>{e.preventDefault();wrap.ontouchmove=onMove;wrap.ontouchend=()=>{wrap.ontouchmove=null}};
+}
+function closeBaModal(){
+  document.getElementById('baModal').classList.remove('open');
+  _upscaledBlob=null;
+}
+async function applyUpscaledImg(){
+  if(!_upscaledBlob)return;
+  state.imgOrigBlob=state.imgBlob=_upscaledBlob;
+  const url=URL.createObjectURL(_upscaledBlob);
+  showImgPreview(url,'upscaled.jpg',_upscaledBlob.size);
+  loadEditorImage(url);
+  closeBaModal();logOk('Đã dùng ảnh làm nét làm ảnh chính ✨');
+}
+
+/* ════════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════════ */
 drawCanvas();
+pushHistory();
+renderPresets();
 logDim('AoV Poster Changer — sẵn sàng.');
 logDim('──────────────────────────────');
 logInf('Chọn loại → xác thực → ảnh → chạy.');
