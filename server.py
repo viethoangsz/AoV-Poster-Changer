@@ -25,6 +25,7 @@ _ssl.verify_mode = ssl.CERT_NONE
 
 
 class Handler(SimpleHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"
     # ── CORS pre-flight ──────────────────────────────────────────────────────
     def do_OPTIONS(self):
         self.send_response(200)
@@ -37,12 +38,73 @@ class Handler(SimpleHTTPRequestHandler):
             self._pinterest_search()
         elif self.path == "/api/removebg":
             self._removebg()
+        elif self.path == "/api/pollinations/upscale":
+            self._pollinations_upscale()
         else:
             self.send_error(404)
 
+    # ── Pollinations upscale proxy ───────────────────────────────────────────
+    def _pollinations_upscale(self):
+        length = int(self.headers.get("Content-Length") or 0)
+        body   = self.rfile.read(length)
+        ct     = self.headers.get("Content-Type") or "application/octet-stream"
+        req = urllib.request.Request(
+            "https://image.pollinations.ai/models/upscale",
+            data=body,
+            headers={"Content-Type": ct, "Content-Length": str(len(body))},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, context=_ssl, timeout=120) as r:
+                resp_data = r.read()
+                resp_ct   = r.headers.get("Content-Type", "image/png")
+            self.send_response(200)
+            self.send_header("Content-Type", resp_ct)
+            self.send_header("Content-Length", str(len(resp_data)))
+            self._cors()
+            self.end_headers()
+            self.wfile.write(resp_data)
+        except urllib.error.HTTPError as e:
+            err_body = e.read()
+            self.send_response(e.code)
+            self.send_header("Content-Type", "application/json")
+            self._cors()
+            self.end_headers()
+            self.wfile.write(err_body if err_body else
+                             json.dumps({"error": f"Pollinations HTTP {e.code}"}).encode())
+        except Exception as e:
+            self._json({"success": False, "error": str(e)}, 502)
+
     # ── image proxy (GET /api/proxy-image?url=...) ──────────────────────────
     def do_GET(self):
-        if self.path.startswith("/api/proxy-image"):
+        if self.path.startswith("/api/removebg"):
+            qs = urllib.parse.urlparse(self.path).query
+            params = dict(urllib.parse.parse_qsl(qs))
+            img_url = params.get("url", "")
+            if not img_url:
+                self.send_error(400, "Missing url param"); return
+            target = f"{REMOVEBG_API}?url={urllib.parse.quote(img_url, safe='')}"
+            req = urllib.request.Request(target, headers={"User-Agent": "Mozilla/5.0"})
+            try:
+                with urllib.request.urlopen(req, context=_ssl, timeout=60) as r:
+                    resp_data = r.read()
+                    resp_ct   = r.headers.get("Content-Type", "application/json")
+                self.send_response(200)
+                self.send_header("Content-Type", resp_ct)
+                self.send_header("Content-Length", str(len(resp_data)))
+                self._cors()
+                self.end_headers()
+                self.wfile.write(resp_data)
+            except urllib.error.HTTPError as e:
+                err_body = e.read()
+                self.send_response(e.code)
+                self.send_header("Content-Type", "application/json")
+                self._cors()
+                self.end_headers()
+                self.wfile.write(err_body)
+            except Exception as e:
+                self._json({"success": False, "error": str(e)}, 502)
+        elif self.path.startswith("/api/proxy-image"):
             qs = urllib.parse.urlparse(self.path).query
             params = dict(urllib.parse.parse_qsl(qs))
             img_url = params.get("url", "")
@@ -66,6 +128,7 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_error(502, str(e))
         else:
             super().do_GET()
+
 
     # ── Pinterest search ─────────────────────────────────────────────────────
     def _pinterest_search(self):
