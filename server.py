@@ -185,17 +185,21 @@ class Handler(SimpleHTTPRequestHandler):
                     head[8:12] == b'WEBP' or
                     head[:2] == b'BM')
 
-        def _pillow_upscale(src: bytes) -> bytes:
-            """Fallback: 2× LANCZOS upscale using Pillow."""
-            from PIL import Image
-            from io import BytesIO
-            img = Image.open(BytesIO(src))
-            w, h = img.size
-            up = img.resize((w * 2, h * 2), Image.LANCZOS)
-            out = BytesIO()
-            fmt = "JPEG" if img.format == "JPEG" else "PNG"
-            up.save(out, format=fmt, quality=92)
-            return out.getvalue(), ("image/jpeg" if fmt == "JPEG" else "image/png")
+        def _pillow_upscale(src: bytes):
+            """Fallback: 2× LANCZOS upscale using Pillow (if available)."""
+            try:
+                from PIL import Image
+                from io import BytesIO as _BIO
+                img = Image.open(_BIO(src))
+                w, h = img.size
+                up = img.resize((w * 2, h * 2), Image.LANCZOS)
+                out = _BIO()
+                fmt = "JPEG" if img.format == "JPEG" else "PNG"
+                up.save(out, format=fmt, quality=92)
+                return out.getvalue(), ("image/jpeg" if fmt == "JPEG" else "image/png")
+            except ImportError:
+                # Pillow not installed — return original unchanged
+                return src, "image/jpeg"
 
         try:
             # ── Step 1: call Satoru API ──────────────────────────────────────
